@@ -1,0 +1,94 @@
+// client/src/components/Auth/Login.js
+import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { login } from '../../services/authService';
+import messages from '../../utils/messages';
+
+const Login = ({ setUser }) => {
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const { email, password } = formData;
+
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    
+    // Form validation
+    if (!email || !password) {
+      setError(messages.REQUIRED_FIELD);
+      return;
+    }
+    
+    setLoading(true);
+    setError('');
+    
+    try {
+      const data = await login({ email, password });
+      setUser(data.user);
+      
+      // Redirect based on role
+      if (data.user.role === 'admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      setError(err.message || messages.LOGIN_FAILED);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="login-container">
+      <h1>Login</h1>
+      {error && <div className="alert alert-danger">{error}</div>}
+      <form onSubmit={onSubmit}>
+        <div className="form-group">
+          <label htmlFor="email">Email Address</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            value={email}
+            onChange={onChange}
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="password">Password</label>
+          <input
+            type="password"
+            name="password"
+            id="password"
+            value={password}
+            onChange={onChange}
+            placeholder="Enter your password"
+            required
+          />
+          <div className="forgot-password-link">
+            <Link to="/forgot-password">Forgot password?</Link>
+          </div>
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? 'Logging in...' : 'Login'}
+        </button>
+      </form>
+      <p>
+        Don't have an account? <Link to="/register">Register</Link>
+      </p>
+    </div>
+  );
+};
+
+export default Login;

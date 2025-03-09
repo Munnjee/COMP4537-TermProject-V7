@@ -1,18 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { getCurrentUser } from './services/authService';
+import React, { useState, useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { getCurrentUser } from "./services/authService";
 
 // Components
-import Login from './components/Auth/Login';
-import Register from './components/Auth/Register';
-import ForgotPassword from './components/Auth/ForgotPassword';
-import ResetPassword from './components/Auth/ResetPassword';
-import UserDashboard from './components/User/Dashboard';
-import AdminDashboard from './components/Admin/Dashboard';
-import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Login from "./components/Auth/Login";
+import Register from "./components/Auth/Register";
+import ForgotPassword from "./components/Auth/ForgotPassword";
+import ResetPassword from "./components/Auth/ResetPassword";
+import UserHomepage from "./components/User/Homepage";
+import AdminDashboard from "./components/Admin/Dashboard";
+import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
 // CSS
-import './App.css';
+import "./App.css";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -25,7 +30,7 @@ const App = () => {
         const userData = await getCurrentUser();
         setUser(userData);
       } catch (error) {
-        console.error('Error checking user:', error);
+        console.error("Error checking user:", error);
       } finally {
         setLoading(false);
       }
@@ -47,7 +52,9 @@ const App = () => {
             path="/login"
             element={
               user ? (
-                <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} />
+                <Navigate
+                  to={user.role === "admin" ? "/admin/dashboard" : "/"}
+                />
               ) : (
                 <Login setUser={setUser} />
               )
@@ -56,40 +63,24 @@ const App = () => {
           <Route
             path="/register"
             element={
-              user ? (
-                <Navigate to="/dashboard" />
-              ) : (
-                <Register setUser={setUser} />
-              )
+              user ? <Navigate to="/" /> : <Register setUser={setUser} />
             }
           />
           <Route
             path="/forgot-password"
-            element={
-              user ? (
-                <Navigate to="/dashboard" />
-              ) : (
-                <ForgotPassword />
-              )
-            }
+            element={user ? <Navigate to="/" /> : <ForgotPassword />}
           />
           <Route
             path="/reset-password/:token"
-            element={
-              user ? (
-                <Navigate to="/dashboard" />
-              ) : (
-                <ResetPassword />
-              )
-            }
+            element={user ? <Navigate to="/" /> : <ResetPassword />}
           />
 
           {/* Protected Routes */}
           <Route
-            path="/dashboard"
+            path="/"
             element={
               <ProtectedRoute user={user}>
-                <UserDashboard user={user} setUser={setUser} />
+                <UserHomepage user={user} setUser={setUser} />
               </ProtectedRoute>
             }
           />
@@ -107,7 +98,9 @@ const App = () => {
             path="/"
             element={
               user ? (
-                <Navigate to={user.role === 'admin' ? '/admin/dashboard' : '/dashboard'} />
+                <Navigate
+                  to={user.role === "admin" ? "/admin/dashboard" : "/"}
+                />
               ) : (
                 <Navigate to="/login" />
               )

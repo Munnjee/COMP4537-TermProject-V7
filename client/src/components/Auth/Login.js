@@ -1,16 +1,16 @@
 // client/src/components/Auth/Login.js
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../../services/authService';
-import messages from '../../utils/messages';
+import React, { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { login } from "../../services/authService";
+import messages from "../../utils/messages";
 
 const Login = ({ setUser }) => {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const { email, password } = formData;
@@ -21,25 +21,25 @@ const Login = ({ setUser }) => {
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Form validation
     if (!email || !password) {
       setError(messages.REQUIRED_FIELD);
       return;
     }
-    
+
     setLoading(true);
-    setError('');
-    
+    setError("");
+
     try {
       const data = await login({ email, password });
       setUser(data.user);
-      
+
       // Redirect based on role
-      if (data.user.role === 'admin') {
-        navigate('/admin/dashboard');
+      if (data.user.role === "admin") {
+        navigate("/admin/dashboard");
       } else {
-        navigate('/dashboard');
+        navigate("/");
       }
     } catch (err) {
       setError(err.message || messages.LOGIN_FAILED);
@@ -81,7 +81,7 @@ const Login = ({ setUser }) => {
           </div>
         </div>
         <button type="submit" disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
+          {loading ? "Logging in..." : "Login"}
         </button>
       </form>
       <p>

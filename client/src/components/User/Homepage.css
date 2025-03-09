@@ -1,3 +1,7 @@
+.welcome-section h3::after {
+  display: none;
+}
+
 .trivia-homepage {
   max-width: 1200px;
   margin: 0 auto;
@@ -16,6 +20,21 @@
   align-items: center;
   margin-bottom: 20px;
   padding: 15px 0;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column-reverse;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .header h1 {
+    margin-top: 15px;
+    margin-bottom: 0;
+  }
 }
 
 .user-info {
@@ -54,7 +73,7 @@
 }
 
 .header h1::after {
-  content: "🎮";
+  content: "💡";
   position: absolute;
   font-size: 2rem;
   top: -5px;
@@ -91,8 +110,9 @@
 
 .welcome-section {
   text-align: center;
-  margin: 20px auto 60px;
-  padding: 20px 30px;
+  margin: 10px auto 40px;
+  /* Increased bottom margin to 40px */
+  padding: 0;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
@@ -102,6 +122,28 @@
   transform: none;
   border: none;
   max-width: 800px;
+}
+
+/* Add divider between welcome section and topics */
+.welcome-section::after {
+  content: "";
+  display: block;
+  width: 120px;
+  height: 2px;
+  background: linear-gradient(90deg, rgba(108, 92, 231, 0.1), rgba(108, 92, 231, 0.5), rgba(108, 92, 231, 0.1));
+  margin: 30px auto 0;
+  border-radius: 2px;
+}
+
+.welcome-section h3 {
+  text-align: center;
+  color: #6c5ce7;
+  margin-bottom: 25px;
+  font-size: 2.2rem;
+  font-weight: 700;
+  position: relative;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
 }
 
 .welcome-section h2 {
@@ -116,15 +158,16 @@
 }
 
 .start-game-button {
-  background-color: #6c5ce7;
+  /* Changed to match the heading */
   color: white;
   border: none;
-  padding: 18px 35px;
+  padding: 18px 40px;
+  /* Increased horizontal padding */
   font-size: 1.3rem;
   border-radius: 50px;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 10px 25px rgba(108, 92, 231, 0.4);
+  /* Updated shadow color */
   font-weight: 700;
   position: relative;
   z-index: 1;
@@ -133,6 +176,8 @@
   display: inline-block;
   width: auto;
   transform: rotate(-1deg);
+  margin-top: 5px;
+  /* Added top margin */
 }
 
 .start-game-button::before {
@@ -147,9 +192,10 @@
 }
 
 .start-game-button:hover {
-  background-color: #5549d3;
+  /* Updated hover color */
   transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 15px 25px rgba(108, 92, 231, 0.4);
+  box-shadow: 0 15px 25px rgba(141, 64, 255, 0.5);
+  /* Updated shadow color */
 }
 
 .start-game-button:hover::before {
@@ -157,7 +203,7 @@
 }
 
 .topics-section {
-  margin-top: 10px;
+  margin-top: 20px;
   position: relative;
   padding-bottom: 20px;
 }
@@ -165,7 +211,8 @@
 .topics-section h3 {
   text-align: center;
   color: #6c5ce7;
-  margin-bottom: 40px;
+  /* Changed back to purple */
+  margin-bottom: 20px;
   font-size: 2.2rem;
   font-weight: 700;
   position: relative;
@@ -173,25 +220,20 @@
   left: 50%;
   transform: translateX(-50%);
   font-family: 'Montserrat', sans-serif;
+  padding-top: 5px;
 }
 
+/* Remove the line after h3 */
 .topics-section h3::after {
-  content: "";
-  position: absolute;
-  width: 80px;
-  height: 4px;
-  background: linear-gradient(90deg, #a29bfe, #6c5ce7);
-  bottom: -10px;
-  left: 50%;
-  transform: translateX(-50%);
-  border-radius: 10px;
+  display: none;
 }
 
 .topics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 20px;
-  padding: 0;
+  padding: 10px 0 0 0;
+  /* Added top padding */
   position: relative;
   max-width: 1000px;
   margin: 0 auto;
@@ -279,55 +321,20 @@
   font-family: 'Nunito', sans-serif;
 }
 
-/* Wide variety of card shapes */
-.topic-card:nth-child(10n) .card-front,
-.topic-card:nth-child(10n) .card-back {
+/* Wide variety of card shapes - simplified to just a few core shapes */
+.topic-card:nth-child(3n) .card-front,
+.topic-card:nth-child(3n) .card-back {
   border-radius: 20px;
 }
 
-.topic-card:nth-child(10n+1) .card-front,
-.topic-card:nth-child(10n+1) .card-back {
-  border-radius: 50% 20px;
-}
-
-.topic-card:nth-child(10n+2) .card-front,
-.topic-card:nth-child(10n+2) .card-back {
-  border-radius: 15px 50px;
-}
-
-.topic-card:nth-child(10n+3) .card-front,
-.topic-card:nth-child(10n+3) .card-back {
+.topic-card:nth-child(3n+1) .card-front,
+.topic-card:nth-child(3n+1) .card-back {
   border-radius: 50%;
 }
 
-.topic-card:nth-child(10n+4) .card-front,
-.topic-card:nth-child(10n+4) .card-back {
-  border-radius: 10px 40px 10px 40px;
-}
-
-.topic-card:nth-child(10n+5) .card-front,
-.topic-card:nth-child(10n+5) .card-back {
-  border-radius: 60px 5px;
-}
-
-.topic-card:nth-child(10n+6) .card-front,
-.topic-card:nth-child(10n+6) .card-back {
-  border-radius: 50% 0;
-}
-
-.topic-card:nth-child(10n+7) .card-front,
-.topic-card:nth-child(10n+7) .card-back {
-  border-radius: 30px 30px 5px 5px;
-}
-
-.topic-card:nth-child(10n+8) .card-front,
-.topic-card:nth-child(10n+8) .card-back {
-  border-radius: 5px 5px 30px 30px;
-}
-
-.topic-card:nth-child(10n+9) .card-front,
-.topic-card:nth-child(10n+9) .card-back {
-  border-radius: 0 50% 50% 0;
+.topic-card:nth-child(3n+2) .card-front,
+.topic-card:nth-child(3n+2) .card-back {
+  border-radius: 15px 50px;
 }
 
 /* Modern gradient backgrounds - fill the entire card */
@@ -526,13 +533,13 @@
 }
 
 .modal-buttons button:nth-child(2) {
-  background-color: #6c5ce7;
+  background-color: #6c5ce7 !important;
   color: white;
   flex: 1;
 }
 
 .modal-buttons button:nth-child(2):hover {
-  background-color: #5549d3;
+  background-color: #5549d3 !important;
   transform: translateY(-3px);
 }
 

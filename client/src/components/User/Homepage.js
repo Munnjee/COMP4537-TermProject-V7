@@ -117,7 +117,7 @@ const UserHomepage = ({ user, setUser }) => {
   return (
     <div className="trivia-homepage">
       <div className="header">
-        <h1>Trivia Generator</h1>
+        <h1>Let's TRIVIA</h1>
         <div className="user-info">
           <div className="games-remaining">
             Free Games Today: {user.apiCallsRemaining || 0}
@@ -129,7 +129,13 @@ const UserHomepage = ({ user, setUser }) => {
       </div>
 
       <div className="topics-section">
-        <h3>Hi, {user.firstName}! Ready for a TRIVIA?</h3>
+        <h3>Hi {user.firstName}! Ready for a game?</h3>
+
+        <div className="welcome-section">
+          <button className="start-game-button" onClick={handleStartGame}>
+            Start
+          </button>
+        </div>
         <div className="topics-grid">
           {popularTopics.map((topic) => (
             <div
@@ -174,12 +180,6 @@ const UserHomepage = ({ user, setUser }) => {
             </div>
           ))}
         </div>
-      </div>
-
-      <div className="welcome-section">
-        <button className="start-game-button" onClick={handleStartGame}>
-          Start Game
-        </button>
       </div>
 
       {showModal && (

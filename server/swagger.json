@@ -68,6 +68,27 @@
             "example": "Error message"
           }
         }
+      },
+      "TriviaQuestion": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "example": "Which planet is known as the Red Planet?"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["Jupiter", "Mars", "Venus", "Saturn"]
+          },
+          "correctAnswer": {
+            "type": "string",
+            "example": "Mars",
+            "description": "The correct answer text"
+          }
+        }
       }
     }
   },
@@ -898,6 +919,103 @@
           },
           "404": {
             "description": "User not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/trivia/generate": {
+      "post": {
+        "summary": "Generate trivia questions",
+        "tags": ["Trivia"],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["topic"],
+                "properties": {
+                  "topic": {
+                    "type": "string",
+                    "example": "science"
+                  },
+                  "count": {
+                    "type": "integer",
+                    "example": 5,
+                    "description": "Number of questions to generate (default: 5)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successfully generated trivia questions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/TriviaQuestion"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing topic parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "API call limit reached",
             "content": {
               "application/json": {
                 "schema": {

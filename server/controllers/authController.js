@@ -105,7 +105,10 @@ exports.getMe = async (req, res, next) => {
         role: user.role,
         apiCallsCount: user.apiCallsCount,
         apiCallsLimit: config.FREE_API_CALLS,
-        apiCallsRemaining: Math.max(0, config.FREE_API_CALLS - user.apiCallsCount),
+        apiCallsRemaining: Math.max(
+          0,
+          config.FREE_API_CALLS - user.apiCallsCount
+        ),
         hasReachedLimit: user.hasReachedApiLimit(),
       },
     });
@@ -131,6 +134,43 @@ exports.logout = (req, res, next) => {
     success: true,
     message: messages.USER_LOGGED_OUT,
   });
+};
+
+// @desc    Update user details
+// @route   PUT /api/v1/auth/updatedetails
+// @access  Private
+exports.editUser = async (req, res, next) => {
+  try {
+    const fieldsToUpdate = req.body;
+
+    const user = await User.findByIdAndUpdate(req.user.id, fieldsToUpdate, {
+      new: true,
+      runValidators: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: {
+        id: user._id,
+        firstName: user.firstName,
+        email: user.email,
+        role: user.role,
+        apiCallsCount: user.apiCallsCount,
+        apiCallsLimit: config.FREE_API_CALLS,
+        apiCallsRemaining: Math.max(
+          0,
+          config.FREE_API_CALLS - user.apiCallsCount
+        ),
+        hasReachedLimit: user.hasReachedApiLimit(),
+      },
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: messages.SERVER_ERROR,
+    });
+  }
 };
 
 // Helper function to create token, create cookie and send response
@@ -161,7 +201,10 @@ const sendTokenResponse = (user, statusCode, res) => {
         role: user.role,
         apiCallsCount: user.apiCallsCount,
         apiCallsLimit: config.FREE_API_CALLS,
-        apiCallsRemaining: Math.max(0, config.FREE_API_CALLS - user.apiCallsCount),
+        apiCallsRemaining: Math.max(
+          0,
+          config.FREE_API_CALLS - user.apiCallsCount
+        ),
         hasReachedLimit: user.hasReachedApiLimit(),
       },
     });

@@ -40,6 +40,16 @@ export const getCurrentUser = async () => {
   }
 };
 
+// Edit user
+export const editUser = async (userData) => {
+  try {
+    const response = await api.put('/auth/updatedetails', userData);
+    return response.data.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { message: 'Network error' };
+  }
+};
+
 // Logout user
 export const logout = async () => {
   try {

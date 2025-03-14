@@ -3,6 +3,7 @@ const {
   register,
   login,
   getMe,
+  editUser,
   logout,
 } = require('../controllers/authController');
 const {
@@ -24,5 +25,8 @@ router.get('/logout', protect, logout);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password/:token', resetPassword);
 router.get('/verify-reset-token/:token', verifyResetToken);
+
+// Edit user
+router.put('/updatedetails', protect, editUser);
 
 module.exports = router;

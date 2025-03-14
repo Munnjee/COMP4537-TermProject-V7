@@ -33,7 +33,9 @@ export const getCurrentUser = async () => {
     const response = await api.get('/auth/me');
     return response.data.data;
   } catch (error) {
-    console.error('Error fetching current user:', error);
+    if (error.response && error.response.status !== 401) {
+      console.error('Error fetching current user:', error);
+    }
     return null;
   }
 };

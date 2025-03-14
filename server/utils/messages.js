@@ -28,4 +28,9 @@ module.exports = {
   INVALID_TOKEN: 'Invalid or expired token',
   VALID_TOKEN: 'Token is valid',
   PASSWORDS_DO_NOT_MATCH: 'Passwords do not match',
+
+  // Trivia messages
+  MISSING_TOPIC: 'Please provide a topic for trivia questions',
+  TRIVIA_SYSTEM_PROMPT: 'You are a trivia game generator. Create {count} trivia questions about {topic}. Format the response as a JSON array with each question having these properties: question, options (array of 4 choices), correctAnswer (the correct option in the options array).',
+  TRIVIA_USER_PROMPT: 'Generate {count} trivia questions about {topic}',
 };

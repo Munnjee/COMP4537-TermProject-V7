@@ -17,4 +17,10 @@ module.exports = {
   SMTP_PASSWORD: process.env.SMTP_PASSWORD || 'your_smtp_password',
   FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@seominji.me',
   FROM_NAME: process.env.FROM_NAME || 'COMP4537 V7 Project',
+
+  // OpenAI configuration
+  OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+  OPENAI_MODEL: 'gpt-3.5-turbo',
+  OPENAI_API_URL: 'https://api.openai.com/v1/chat/completions',
+  DEFAULT_QUESTION_COUNT: 5, 
 };

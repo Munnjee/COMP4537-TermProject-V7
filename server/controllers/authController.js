@@ -185,6 +185,7 @@ const sendTokenResponse = (user, statusCode, res) => {
   // Secure in production
   if (config.NODE_ENV === 'production') {
     options.secure = true;
+    options.sameSite = 'None';
   }
 
   res

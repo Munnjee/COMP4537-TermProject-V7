@@ -155,7 +155,7 @@ const UserHomepage = ({ user, setUser }) => {
         <h1>Let's TRIVIA</h1>
         <div className='user-info'>
           <div className='games-remaining'>
-            Free Games Today: {user.apiCallsRemaining || 0}
+            Free Games: {user.apiCallsRemaining || 0}
           </div>
           <button id='home-logout' onClick={handleLogout}>
             Logout

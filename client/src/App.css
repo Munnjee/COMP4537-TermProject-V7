@@ -28,12 +28,27 @@ body {
   line-height: 1.6;
   background-color: var(--body-bg);
   color: var(--dark-color);
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #f9f7fe;
 }
 
 .app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+  height: auto;
+  overflow: visible;
+  background-color: #f9f7fe;
+  border: none;
 }
 
 /* Loading States */
@@ -151,7 +166,7 @@ a:hover {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   padding: 30px;
-  margin-top: 20px;
+  margin: 20px;
 }
 
 .api-usage-card {

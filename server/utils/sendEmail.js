@@ -1,129 +1,85 @@
 const net = require('net');
 const tls = require('tls');
-const config = require('../config/config');
+const { promisify } = require('util');
 
-/**
- * Sends an email using SMTP
- * @param {Object} options - Email options
- * @param {string} options.email - Recipient email
- * @param {string} options.subject - Email subject
- * @param {string} options.html - Email content
- * @returns {Promise<boolean>} - True if email sent successfully
- */
 const sendEmail = async (options) => {
-  let socket;
-  let connected = false;
+  const { email, subject, html } = options;
+  const { SMTP_HOST, SMTP_PORT, SMTP_EMAIL, SMTP_PASSWORD, FROM_EMAIL, FROM_NAME } = require('../config/config');
   
-  try {
-    // Email sender configuration
-    const host = config.EMAIL_HOST || 'smtp.gmail.com';
-    const port = parseInt(config.EMAIL_PORT || 587);
-    const user = config.EMAIL_USER;
-    const pass = config.EMAIL_PASSWORD;
-    const from = config.EMAIL_FROM || user;
-    const recipientEmail = options.email;
-    
-    // Connect to SMTP server
-    socket = net.createConnection(port, host);
-    socket.setTimeout(60000); // 60 seconds timeout
-    
-    // Promisify socket communication
-    const waitForData = (expectedCode) => {
-      return new Promise((resolve, reject) => {
-        const onData = (data) => {
-          const response = data.toString();
-          console.log(`Server: ${response.trim()}`);
-          
-          if (response.startsWith(expectedCode)) {
-            socket.removeListener('data', onData);
-            resolve(response);
-          } else {
-            socket.removeListener('data', onData);
-            reject(new Error(`Expected ${expectedCode}, got: ${response}`));
-          }
-        };
-        
-        socket.on('data', onData);
-      });
-    };
-    
-    // Send command to server
-    const sendCommand = async (command, expectedCode) => {
-      console.log(`Client: ${command}`);
-      socket.write(command + '\r\n');
-      return await waitForData(expectedCode);
-    };
-    
-    // Wait for server greeting
-    await waitForData('220');
-    connected = true;
-    
-    // Start SMTP conversation
-    await sendCommand(`EHLO ${host}`, '250');
-    
-    // GMAIL SPECIFIC: Always use STARTTLS
-    await sendCommand('STARTTLS', '220');
-    
-    // Create secure connection
+  const isSecure = process.env.NODE_ENV === 'production';
+  const client = isSecure ? tls.connect(SMTP_PORT, SMTP_HOST) : net.createConnection(SMTP_PORT, SMTP_HOST);
+  
+  // Helper to wait for server responses
+  const waitFor = (client, expectedCode) => {
     return new Promise((resolve, reject) => {
-      const tlsOptions = {
-        socket,
-        host,
-        rejectUnauthorized: false
-      };
-      
-      // Upgrade socket to TLS
-      socket = tls.connect(tlsOptions, async () => {
-        try {
-          // Resume SMTP conversation over secure connection
-          await sendCommand(`EHLO ${host}`, '250');
-          
-          // Authenticate
-          await sendCommand('AUTH LOGIN', '334');
-          await sendCommand(Buffer.from(user).toString('base64'), '334');
-          await sendCommand(Buffer.from(pass).toString('base64'), '235');
-          
-          // Set sender and recipient
-          await sendCommand(`MAIL FROM:<${from}>`, '250');
-          await sendCommand(`RCPT TO:<${recipientEmail}>`, '250');
-          
-          // Send email data
-          await sendCommand('DATA', '354');
-          
-          // Format email with plain text content
-          let email = '';
-          email += `From: ${from}\r\n`;
-          email += `To: ${recipientEmail}\r\n`;
-          email += `Subject: ${options.subject}\r\n`;
-          email += 'Content-Type: text/plain; charset=utf-8\r\n';
-          email += '\r\n';
-          email += options.html;
-          email += '\r\n.\r\n';
-          
-          // Send email content and finish
-          await sendCommand(email, '250');
-          await sendCommand('QUIT', '221');
-          
-          // Close connection
-          socket.end();
-          resolve(true);
-        } catch (err) {
-          console.error('TLS communication error:', err);
-          if (socket) socket.end();
-          reject(err);
+      client.once('data', (data) => {
+        const response = data.toString();
+        const code = response.substring(0, 3);
+        if (code === expectedCode) {
+          resolve(response);
+        } else {
+          reject(new Error(`Unexpected code: ${response}`));
         }
       });
-      
-      socket.on('error', (err) => {
-        console.error('Socket error:', err);
-        reject(err);
-      });
     });
+  };
+  
+  try {
+    // Wait for server greeting
+    await waitFor(client, '220');
+    
+    // EHLO command
+    client.write(`EHLO ${SMTP_HOST}\r\n`);
+    await waitFor(client, '250');
+    
+    // AUTH LOGIN
+    client.write('AUTH LOGIN\r\n');
+    await waitFor(client, '334');
+    
+    // Send username (base64 encoded)
+    client.write(Buffer.from(SMTP_EMAIL).toString('base64') + '\r\n');
+    await waitFor(client, '334');
+    
+    // Send password (base64 encoded)
+    client.write(Buffer.from(SMTP_PASSWORD).toString('base64') + '\r\n');
+    await waitFor(client, '235');
+    
+    // Mail from
+    client.write(`MAIL FROM:<${FROM_EMAIL}>\r\n`);
+    await waitFor(client, '250');
+    
+    // Recipient
+    client.write(`RCPT TO:<${email}>\r\n`);
+    await waitFor(client, '250');
+    
+    // Data
+    client.write('DATA\r\n');
+    await waitFor(client, '354');
+    
+    // Email content
+    const message = [
+      `From: ${FROM_NAME} <${FROM_EMAIL}>`,
+      `To: <${email}>`,
+      `Subject: ${subject}`,
+      'Content-Type: text/html; charset=utf-8',
+      '',
+      html,
+      '.',
+      ''
+    ].join('\r\n');
+    
+    client.write(message);
+    await waitFor(client, '250');
+    
+    // Quit
+    client.write('QUIT\r\n');
+    client.end();
+    
+    console.log('Email sent successfully');
+    return true;
   } catch (error) {
-    console.error('Email sending error:', error);
-    if (connected && socket) {
-      socket.end();
-    }
+    console.error('Error sending email:', error.message);
+    client.end();
     throw error;
   }
 };

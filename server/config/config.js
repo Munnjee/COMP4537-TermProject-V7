@@ -10,15 +10,17 @@ module.exports = {
   CLIENT_URL: process.env.CLIENT_URL || 'http://localhost:3000',
   FREE_API_CALLS: 20, // Free API calls limit per user
 
-  EMAIL_HOST: process.env.EMAIL_HOST || 'mail.privateemail.com',
-  EMAIL_PORT: process.env.EMAIL_PORT || 587,
-  EMAIL_USER: process.env.EMAIL_USER || 'noreply@seominji.me',
-  EMAIL_PASSWORD: process.env.EMAIL_PASSWORD,
-  EMAIL_FROM: process.env.EMAIL_FROM || 'noreply@seominji.me',
+  // Email configuration
+  SMTP_HOST: process.env.SMTP_HOST || 'smtp.mailtrap.io',
+  SMTP_PORT: process.env.SMTP_PORT || 2525,
+  SMTP_EMAIL: process.env.SMTP_EMAIL || 'apikey',
+  SMTP_PASSWORD: process.env.SMTP_PASSWORD || 'your_smtp_password',
+  FROM_EMAIL: process.env.FROM_EMAIL || 'noreply@seominji.me',
+  FROM_NAME: process.env.FROM_NAME || 'COMP4537 V7 Project',
 
   // OpenAI configuration
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   OPENAI_MODEL: 'gpt-3.5-turbo',
   OPENAI_API_URL: 'https://api.openai.com/v1/chat/completions',
-  DEFAULT_QUESTION_COUNT: 5, 
+  DEFAULT_QUESTION_COUNT: 5,
 };

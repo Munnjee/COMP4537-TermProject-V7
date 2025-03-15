@@ -1,19 +1,19 @@
 const net = require('net');
 const tls = require('tls');
-const { promisify } = require('util');
 
 const sendEmail = async (options) => {
   const { email, subject, html } = options;
   const { SMTP_HOST, SMTP_PORT, SMTP_EMAIL, SMTP_PASSWORD, FROM_EMAIL, FROM_NAME } = require('../config/config');
   
-  const isSecure = process.env.NODE_ENV === 'production';
-  const client = isSecure ? tls.connect(SMTP_PORT, SMTP_HOST) : net.createConnection(SMTP_PORT, SMTP_HOST);
+  // Create a plain TCP connection first
+  const socket = net.createConnection(SMTP_PORT, SMTP_HOST);
   
   // Helper to wait for server responses
-  const waitFor = (client, expectedCode) => {
+  const waitFor = (expectedCode) => {
     return new Promise((resolve, reject) => {
-      client.once('data', (data) => {
+      socket.once('data', (data) => {
         const response = data.toString();
+        console.log('Server response:', response);
         const code = response.substring(0, 3);
         if (code === expectedCode) {
           resolve(response);
@@ -24,43 +24,94 @@ const sendEmail = async (options) => {
     });
   };
   
+  // Handle connection errors
+  socket.on('error', (err) => {
+    console.error('Socket error:', err);
+  });
+  
   try {
     // Wait for server greeting
-    await waitFor(client, '220');
+    await waitFor('220');
     
     // EHLO command
-    client.write(`EHLO ${SMTP_HOST}\r\n`);
-    await waitFor(client, '250');
+    socket.write(`EHLO ${SMTP_HOST}\r\n`);
+    await waitFor('250');
+    
+    // Upgrade connection to TLS using STARTTLS
+    socket.write('STARTTLS\r\n');
+    await waitFor('220');
+    
+    // Create TLS socket
+    const tlsSocket = await new Promise((resolve, reject) => {
+      const tlsOptions = {
+        socket: socket,
+        host: SMTP_HOST,
+        rejectUnauthorized: false // For testing, consider setting to true in production
+      };
+      
+      const secureSocket = tls.connect(tlsOptions, () => {
+        if (secureSocket.authorized || !tlsOptions.rejectUnauthorized) {
+          resolve(secureSocket);
+        } else {
+          reject(new Error('TLS authorization failed'));
+        }
+      });
+      
+      secureSocket.on('error', (err) => {
+        reject(err);
+      });
+    });
+    
+    // Replace waitFor to use the TLS socket
+    const secureWaitFor = (expectedCode) => {
+      return new Promise((resolve, reject) => {
+        tlsSocket.once('data', (data) => {
+          const response = data.toString();
+          console.log('Secure server response:', response);
+          const code = response.substring(0, 3);
+          if (code === expectedCode) {
+            resolve(response);
+          } else {
+            reject(new Error(`Unexpected code: ${response}`));
+          }
+        });
+      });
+    };
+    
+    // EHLO again after TLS upgrade
+    tlsSocket.write(`EHLO ${SMTP_HOST}\r\n`);
+    await secureWaitFor('250');
     
     // AUTH LOGIN
-    client.write('AUTH LOGIN\r\n');
-    await waitFor(client, '334');
+    tlsSocket.write('AUTH LOGIN\r\n');
+    await secureWaitFor('334');
     
     // Send username (base64 encoded)
-    client.write(Buffer.from(SMTP_EMAIL).toString('base64') + '\r\n');
-    await waitFor(client, '334');
+    tlsSocket.write(Buffer.from(SMTP_EMAIL).toString('base64') + '\r\n');
+    await secureWaitFor('334');
     
     // Send password (base64 encoded)
-    client.write(Buffer.from(SMTP_PASSWORD).toString('base64') + '\r\n');
-    await waitFor(client, '235');
+    tlsSocket.write(Buffer.from(SMTP_PASSWORD).toString('base64') + '\r\n');
+    await secureWaitFor('235');
     
     // Mail from
-    client.write(`MAIL FROM:<${FROM_EMAIL}>\r\n`);
-    await waitFor(client, '250');
+    tlsSocket.write(`MAIL FROM:<${FROM_EMAIL}>\r\n`);
+    await secureWaitFor('250');
     
     // Recipient
-    client.write(`RCPT TO:<${email}>\r\n`);
-    await waitFor(client, '250');
+    tlsSocket.write(`RCPT TO:<${email}>\r\n`);
+    await secureWaitFor('250');
     
     // Data
-    client.write('DATA\r\n');
-    await waitFor(client, '354');
+    tlsSocket.write('DATA\r\n');
+    await secureWaitFor('354');
     
     // Email content
     const message = [
       `From: ${FROM_NAME} <${FROM_EMAIL}>`,
       `To: <${email}>`,
       `Subject: ${subject}`,
+      'MIME-Version: 1.0',
       'Content-Type: text/html; charset=utf-8',
       '',
       html,
@@ -68,18 +119,18 @@ const sendEmail = async (options) => {
       ''
     ].join('\r\n');
     
-    client.write(message);
-    await waitFor(client, '250');
+    tlsSocket.write(message);
+    await secureWaitFor('250');
     
     // Quit
-    client.write('QUIT\r\n');
-    client.end();
+    tlsSocket.write('QUIT\r\n');
+    tlsSocket.end();
     
     console.log('Email sent successfully');
     return true;
   } catch (error) {
     console.error('Error sending email:', error.message);
-    client.end();
+    socket.end();
     throw error;
   }
 };

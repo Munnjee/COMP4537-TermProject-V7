@@ -7,7 +7,7 @@ const config = require('../config/config');
  * @param {Object} options - Email options
  * @param {string} options.email - Recipient email
  * @param {string} options.subject - Email subject
- * @param {string} options.html - Email HTML content
+ * @param {string} options.html - Email content
  * @returns {Promise<boolean>} - True if email sent successfully
  */
 const sendEmail = async (options) => {
@@ -16,29 +16,23 @@ const sendEmail = async (options) => {
   
   try {
     // Email sender configuration
-    const host = config.EMAIL_HOST || 'mail.privateemail.com';
-    const port = config.EMAIL_PORT || 587;
+    const host = config.EMAIL_HOST || 'smtp.gmail.com';
+    const port = parseInt(config.EMAIL_PORT || 587);
     const user = config.EMAIL_USER;
     const pass = config.EMAIL_PASSWORD;
     const from = config.EMAIL_FROM || user;
-
-    // Store the recipient email from options
     const recipientEmail = options.email;
-
-    // Connect to SMTP server with longer timeout
+    
+    // Connect to SMTP server
     socket = net.createConnection(port, host);
-    socket.setTimeout(120000); // 2 minutes timeout
+    socket.setTimeout(60000); // 60 seconds timeout
     
     // Promisify socket communication
     const waitForData = (expectedCode) => {
       return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-          reject(new Error(`Timeout waiting for ${expectedCode}`));
-        }, 60000); // 1 minute wait for each response
-        
         const onData = (data) => {
           const response = data.toString();
-          clearTimeout(timeout);
+          console.log(`Server: ${response.trim()}`);
           
           if (response.startsWith(expectedCode)) {
             socket.removeListener('data', onData);
@@ -55,6 +49,7 @@ const sendEmail = async (options) => {
     
     // Send command to server
     const sendCommand = async (command, expectedCode) => {
+      console.log(`Client: ${command}`);
       socket.write(command + '\r\n');
       return await waitForData(expectedCode);
     };
@@ -66,7 +61,7 @@ const sendEmail = async (options) => {
     // Start SMTP conversation
     await sendCommand(`EHLO ${host}`, '250');
     
-    // Upgrade to TLS
+    // GMAIL SPECIFIC: Always use STARTTLS
     await sendCommand('STARTTLS', '220');
     
     // Create secure connection
@@ -95,14 +90,14 @@ const sendEmail = async (options) => {
           // Send email data
           await sendCommand('DATA', '354');
           
-          // Format email
+          // Format email with plain text content
           let email = '';
           email += `From: ${from}\r\n`;
           email += `To: ${recipientEmail}\r\n`;
           email += `Subject: ${options.subject}\r\n`;
           email += 'Content-Type: text/plain; charset=utf-8\r\n';
           email += '\r\n';
-          email += options.html.replace(/<[^>]*>/g, '');
+          email += options.html;
           email += '\r\n.\r\n';
           
           // Send email content and finish
@@ -113,12 +108,14 @@ const sendEmail = async (options) => {
           socket.end();
           resolve(true);
         } catch (err) {
-          socket.end();
+          console.error('TLS communication error:', err);
+          if (socket) socket.end();
           reject(err);
         }
       });
       
       socket.on('error', (err) => {
+        console.error('Socket error:', err);
         reject(err);
       });
     });
@@ -132,5 +129,3 @@ const sendEmail = async (options) => {
 };
 
 module.exports = sendEmail;
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

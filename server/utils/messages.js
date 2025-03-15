@@ -25,6 +25,7 @@ module.exports = {
   PASSWORD_REQUIRED: 'Please provide a password',
   PASSWORD_RESET_EMAIL_SENT: 'If this email exists in our system, a password reset link has been sent',
   PASSWORD_RESET_SUCCESS: 'Password has been reset successfully',
+  PASSWORD_RESET_FAILED: 'Failed to reset password. Please try again.',
   INVALID_TOKEN: 'Invalid or expired token',
   VALID_TOKEN: 'Token is valid',
   PASSWORDS_DO_NOT_MATCH: 'Passwords do not match',

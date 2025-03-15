@@ -21,18 +21,24 @@ const sendEmail = async (options) => {
     const user = config.EMAIL_USER;
     const pass = config.EMAIL_PASSWORD;
     const from = config.EMAIL_FROM || user;
-    
-    // Connect to SMTP server
+
+    // Store the recipient email from options
+    const recipientEmail = options.email;
+
+    // Connect to SMTP server with longer timeout
     socket = net.createConnection(port, host);
-    
-    // Set timeout to avoid hanging connections
-    socket.setTimeout(10000); // 10 seconds
+    socket.setTimeout(120000); // 2 minutes timeout
     
     // Promisify socket communication
     const waitForData = (expectedCode) => {
       return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error(`Timeout waiting for ${expectedCode}`));
+        }, 60000); // 1 minute wait for each response
+        
         const onData = (data) => {
           const response = data.toString();
+          clearTimeout(timeout);
           
           if (response.startsWith(expectedCode)) {
             socket.removeListener('data', onData);
@@ -84,7 +90,7 @@ const sendEmail = async (options) => {
           
           // Set sender and recipient
           await sendCommand(`MAIL FROM:<${from}>`, '250');
-          await sendCommand(`RCPT TO:<${options.email}>`, '250');
+          await sendCommand(`RCPT TO:<${recipientEmail}>`, '250');
           
           // Send email data
           await sendCommand('DATA', '354');
@@ -92,12 +98,11 @@ const sendEmail = async (options) => {
           // Format email
           let email = '';
           email += `From: ${from}\r\n`;
-          email += `To: ${options.email}\r\n`;
+          email += `To: ${recipientEmail}\r\n`;
           email += `Subject: ${options.subject}\r\n`;
-          email += 'MIME-Version: 1.0\r\n';
-          email += 'Content-Type: text/html; charset=utf-8\r\n';
+          email += 'Content-Type: text/plain; charset=utf-8\r\n';
           email += '\r\n';
-          email += options.html;
+          email += options.html.replace(/<[^>]*>/g, '');
           email += '\r\n.\r\n';
           
           // Send email content and finish

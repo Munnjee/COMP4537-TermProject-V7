@@ -43,7 +43,7 @@ app.use(limiter);
 // Enable CORS
 app.use(
   cors({
-    origin: config.CLIENT_URL,
+    origin: config.CLIENT_URL || 'http://localhost:3000',
     credentials: true,
   })
 );

@@ -1,4 +1,3 @@
-// server/config/email.js
 const SmtpClient = require('../utils/emailSender');
 
 const emailConfig = {
@@ -20,3 +19,5 @@ module.exports = {
     }
   }
 };
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

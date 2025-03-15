@@ -39,3 +39,5 @@ export const updateUserRole = async (userId, role) => {
     throw error.response ? error.response.data : { message: 'Network error' };
   }
 };
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

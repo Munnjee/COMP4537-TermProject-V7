@@ -1,4 +1,3 @@
-// server/controllers/authController.js
 const User = require('../models/User');
 const messages = require('../utils/messages');
 const config = require('../config/config');
@@ -209,3 +208,5 @@ const sendTokenResponse = (user, statusCode, res) => {
       },
     });
 };
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

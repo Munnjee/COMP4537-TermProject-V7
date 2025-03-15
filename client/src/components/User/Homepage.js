@@ -1,4 +1,3 @@
-// client/src/components/User/Homepage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, editUser, logout } from '../../services/authService';
@@ -251,3 +250,5 @@ const UserHomepage = ({ user, setUser }) => {
 };
 
 export default UserHomepage;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

@@ -23,3 +23,5 @@ PasswordResetSchema.statics.generateToken = function() {
 };
 
 module.exports = mongoose.model('PasswordReset', PasswordResetSchema);
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

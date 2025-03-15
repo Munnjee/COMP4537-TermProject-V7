@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, updateUserRole } from '../../services/adminService';
-import messages from '../../utils/messages';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -118,3 +117,5 @@ const UserManagement = () => {
 };
 
 export default UserManagement;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

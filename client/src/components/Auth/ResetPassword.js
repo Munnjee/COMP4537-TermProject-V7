@@ -1,4 +1,3 @@
-// client/src/components/Auth/ResetPassword.js
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../services/authService';
@@ -151,3 +150,5 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

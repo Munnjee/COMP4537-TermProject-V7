@@ -90,3 +90,5 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

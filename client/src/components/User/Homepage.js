@@ -3,38 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { getCurrentUser, editUser, logout } from '../../services/authService';
 import './Homepage.css';
 import { generateQuestions } from '../../services/apiService';
-
-const popularTopics = [
-  {
-    id: 1,
-    name: 'History',
-    question: 'Who was the first president of the United States?',
-  },
-  { id: 2, name: 'Science', question: 'What is the chemical symbol for gold?' },
-  {
-    id: 3,
-    name: 'Movies',
-    question: 'Which film won the Oscar for Best Picture in 2020?',
-  },
-  { id: 4, name: 'Geography', question: 'What is the capital of Australia?' },
-  {
-    id: 5,
-    name: 'Sports',
-    question: 'Which team has won the most Super Bowls?',
-  },
-  { id: 6, name: 'Music', question: "Who is known as the 'King of Pop'?" },
-  { id: 7, name: 'Literature', question: "Who wrote 'Pride and Prejudice'?" },
-  { id: 8, name: 'Food', question: 'What country is sushi from?' },
-  { id: 9, name: 'Technology', question: 'Who founded Apple Inc.?' },
-  { id: 10, name: 'Animals', question: 'What is the fastest land animal?' },
-  { id: 11, name: 'Art', question: 'Who painted the Mona Lisa?' },
-  {
-    id: 12,
-    name: 'Space',
-    question: 'Which planet is known as the Red Planet?',
-  },
-];
-
+import messages from '../../utils/messages';
+import { popularTopics } from '../../data/topics';
 const UserHomepage = ({ user, setUser }) => {
   const [flippedCards, setFlippedCards] = useState({});
   const [showModal, setShowModal] = useState(false);
@@ -127,13 +97,11 @@ const UserHomepage = ({ user, setUser }) => {
         });
       } else {
         // Handle case when no questions are returned
-        alert(
-          "Couldn't generate questions. Please try again or choose another topic."
-        );
+        alert(messages.QUESTIONS_GENERATION_FAILED);
       }
     } catch (error) {
       console.error('Error generating questions:', error);
-      alert('An error occurred while generating questions. Please try again.');
+      alert(messages.QUESTIONS_GENERATION_ERROR);
     }
 
     handleCloseModal();
@@ -146,29 +114,30 @@ const UserHomepage = ({ user, setUser }) => {
   };
 
   if (!user) {
-    return <div className='loading'>Loading...</div>;
+    return <div className='loading'>{messages.LOADING}</div>;
   }
 
   return (
     <div className='trivia-homepage'>
       <div className='header'>
-        <h1>Let's TRIVIA</h1>
+        <h1>{messages.APP_TITLE}</h1>
         <div className='user-info'>
           <div className='games-remaining'>
-            Free Games: {user.apiCallsRemaining || 0}
+            {messages.FREE_GAMES}
+            {user.apiCallsRemaining || 0}
           </div>
           <button id='home-logout' onClick={handleLogout}>
-            Logout
+            {messages.LOGOUT}
           </button>
         </div>
       </div>
 
       <div className='topics-section'>
-        <h3>Hi {user.firstName}! Ready for a game?</h3>
+        <h3>{messages.WELCOME_USER.replace('{name}', user.firstName)}</h3>
 
         <div className='welcome-section'>
           <button className='start-game-button' onClick={handleStartGame}>
-            Start
+            {messages.START_BUTTON}
           </button>
         </div>
         <div className='topics-grid'>
@@ -223,23 +192,25 @@ const UserHomepage = ({ user, setUser }) => {
             <button className='close-button' onClick={handleCloseModal}>
               ×
             </button>
-            <h2>Start a Trivia Game</h2>
-            <p>Enter a topic or choose from popular options:</p>
+            <h2>{messages.START_GAME_TITLE}</h2>
+            <p>{messages.ENTER_TOPIC_PROMPT}</p>
 
             <input
               type='text'
-              placeholder='Enter your topic...'
+              placeholder={messages.TOPIC_INPUT_PLACEHOLDER}
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
             />
 
             <div className='modal-buttons'>
-              <button onClick={handleRandomTopic}>Random Topic</button>
+              <button onClick={handleRandomTopic}>
+                {messages.RANDOM_TOPIC}
+              </button>
               <button
                 onClick={handleSubmitTopic}
                 disabled={!customTopic.trim()}
               >
-                Start Game
+                {messages.START_GAME}
               </button>
             </div>
           </div>

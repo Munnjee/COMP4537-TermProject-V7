@@ -13,7 +13,7 @@ const messages = {
 
   // API usage messages
   API_LIMIT_REACHED: 'You have reached your free API calls limit.',
-  API_LIMIT_WARNING: 'Warning: You are approaching your free API calls limit.',
+  API_LIMIT_WARNING: 'Warning: You run out of 20 free games',
 
   // Error messages
   SERVER_ERROR: 'Server error. Please try again later.',
@@ -33,7 +33,7 @@ const messages = {
 
   // Homepage messages
   APP_TITLE: "Let's TRIVIA",
-  FREE_GAMES: 'Free Games: ',
+  GAMES_PLAYED: 'Games Played: ',
   LOGOUT: 'Logout',
   WELCOME_USER: 'Hi {name}! Ready for a game?',
   START_BUTTON: 'Start',

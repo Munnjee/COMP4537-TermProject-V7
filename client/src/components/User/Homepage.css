@@ -42,11 +42,14 @@
 
 .user-info {
   display: flex;
+  justify-content: flex-end;
   align-items: center;
-  gap: 15px;
+  width: 100%;
+  margin-bottom: 8px;
 }
 
-.games-remaining {
+
+.games-played {
   background-color: rgba(108, 92, 231, 0.1);
   color: #6c5ce7;
   padding: 8px 15px;
@@ -54,13 +57,32 @@
   font-size: 0.9rem;
   font-weight: 600;
   display: flex;
+  margin-right: 5px;
   align-items: center;
 }
 
-.games-remaining::before {
+.games-played::before {
   content: "🎮";
   margin-right: 8px;
   font-size: 1.1rem;
+}
+
+.user-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.api-limit {
+  background-color: rgba(254, 134, 134, 0.1);
+  color: #e75c5c;
+  padding: 8px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+
 }
 
 .header h1 {

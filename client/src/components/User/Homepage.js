@@ -121,14 +121,21 @@ const UserHomepage = ({ user, setUser }) => {
     <div className='trivia-homepage'>
       <div className='header'>
         <h1>{messages.APP_TITLE}</h1>
-        <div className='user-info'>
-          <div className='games-remaining'>
-            {messages.FREE_GAMES}
-            {user.apiCallsRemaining || 0}
+        <div className='user-section'>
+          <div className='user-info'>
+            <div className='games-played'>
+              {messages.GAMES_PLAYED}
+              {user.apiCallsCount || 0}
+            </div>
+            <button id='home-logout' onClick={handleLogout}>
+              {messages.LOGOUT}
+            </button>
           </div>
-          <button id='home-logout' onClick={handleLogout}>
-            {messages.LOGOUT}
-          </button>
+          <div className='api-limit'>
+            {user.apiCallsCount >= 20 && (
+              <span className='warning'>{messages.API_LIMIT_WARNING}</span>
+            )}
+          </div>
         </div>
       </div>
 

@@ -4,7 +4,7 @@ import { getCurrentUser } from '../../services/authService';
 import messages from '../../utils/messages';
 import './UserManagement.css';
 
-const UserManagement = () => {
+const UserManagement = ({ onUserUpdated }) => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -52,6 +52,12 @@ const UserManagement = () => {
         user._id === userId ? { ...user, role: newRole } : user
       ));
       setSuccessMessage(`${messages.ROLE_UPDATED} ${newRole} successfully!`);
+      
+      // Call the callback to update dashboard stats
+      if (onUserUpdated) {
+        onUserUpdated();
+      }
+      
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -86,6 +92,12 @@ const UserManagement = () => {
       // Remove deleted users from state
       setUsers(users.filter(user => !selectedUsers.includes(user._id)));
       setSuccessMessage(`Successfully deleted ${selectedUsers.length} user(s)`);
+      
+      // Call the callback to update dashboard stats
+      if (onUserUpdated) {
+        onUserUpdated();
+      }
+      
       // Reset selections
       setSelectedUsers([]);
       setTimeout(() => {

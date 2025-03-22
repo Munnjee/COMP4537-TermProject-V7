@@ -17,6 +17,26 @@ const AdminDashboard = ({ user, setUser }) => {
   const [showAccessDenied, setShowAccessDenied] = useState(false);
   const navigate = useNavigate();
 
+  // Function to fetch stats from the API
+  const fetchStats = async () => {
+    try {
+      setLoading(true);
+      const [endpointRes, userRes] = await Promise.all([
+        getApiStats(),
+        getUserStats()
+      ]);
+
+      setEndpointStats(endpointRes.data);
+      setUserStats(userRes.data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching stats:', err);
+      setError(messages.SERVER_ERROR);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
@@ -29,25 +49,6 @@ const AdminDashboard = ({ user, setUser }) => {
           setShowAccessDenied(true);
           setLoading(false);
         }
-      }
-    };
-
-    const fetchStats = async () => {
-      try {
-        setLoading(true);
-        const [endpointRes, userRes] = await Promise.all([
-          getApiStats(),
-          getUserStats()
-        ]);
-
-        setEndpointStats(endpointRes.data);
-        setUserStats(userRes.data);
-        setError('');
-      } catch (err) {
-        console.error('Error fetching stats:', err);
-        setError(messages.SERVER_ERROR);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -165,7 +166,7 @@ const AdminDashboard = ({ user, setUser }) => {
         )}
 
         {activeTab === 'management' && (
-          <UserManagement />
+          <UserManagement onUserUpdated={fetchStats} />
         )}
       </div>
 
@@ -177,5 +178,3 @@ const AdminDashboard = ({ user, setUser }) => {
 };
 
 export default AdminDashboard;
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

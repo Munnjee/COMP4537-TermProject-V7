@@ -16,6 +16,8 @@ import UserHomepage from './components/User/Homepage';
 import AdminDashboard from './components/Admin/Dashboard';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Game from './components/User/Game';
+import NotFound from './components/Common/NotFound';
+import RouteChecker from './components/Common/RouteChecker';
 
 // CSS
 import './App.css';
@@ -101,19 +103,12 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          {/* Default Route */}
-          <Route
-            path='*'
-            element={
-              user ? (
-                <Navigate
-                  to={user.role === 'admin' ? '/admin/dashboard' : '/'}
-                />
-              ) : (
-                <Navigate to='/login' />
-              )
-            }
-          />
+
+          {/* 404 Route - Explicit Not Found Page */}
+          <Route path='/404' element={<NotFound />} />
+
+          {/* Default Route - Check if it exists on backend, otherwise show 404 */}
+          <Route path='*' element={<RouteChecker user={user} />} />
         </Routes>
       </div>
     </Router>
@@ -121,5 +116,3 @@ const App = () => {
 };
 
 export default App;
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

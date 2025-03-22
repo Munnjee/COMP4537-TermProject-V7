@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "AI-Powered API Service",
+    "title": "Trivia Quiz API",
     "version": "1.0.0",
-    "description": "A RESTful API that provides AI-powered services"
+    "description": "A RESTful API for a trivia quiz application with authentication, admin management, and AI-powered question generation"
   },
   "servers": [
     {
@@ -12,10 +12,10 @@
   ],
   "components": {
     "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "JWT"
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "token"
       }
     },
     "schemas": {
@@ -36,6 +36,7 @@
           },
           "role": {
             "type": "string",
+            "enum": ["user", "admin"],
             "example": "user"
           },
           "apiCallsCount": {
@@ -69,6 +70,19 @@
           }
         }
       },
+      "Success": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Success message"
+          }
+        }
+      },
       "TriviaQuestion": {
         "type": "object",
         "properties": {
@@ -85,8 +99,45 @@
           },
           "correctAnswer": {
             "type": "string",
-            "example": "Mars",
-            "description": "The correct answer text"
+            "example": "Mars"
+          }
+        }
+      },
+      "ApiStats": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "example": "GET"
+          },
+          "endpoint": {
+            "type": "string",
+            "example": "/api/v1/auth/me"
+          },
+          "requestCount": {
+            "type": "integer",
+            "example": 42
+          }
+        }
+      },
+      "UserStats": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "example": "60d21b4667d0d8992e610c85"
+          },
+          "email": {
+            "type": "string",
+            "example": "john@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "totalRequests": {
+            "type": "integer",
+            "example": 15
           }
         }
       }
@@ -103,7 +154,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["firstName", "email", "password"],
+                "required": ["firstName", "email", "password", "confirmPassword"],
                 "properties": {
                   "firstName": {
                     "type": "string",
@@ -115,6 +166,11 @@
                     "example": "john@example.com"
                   },
                   "password": {
+                    "type": "string",
+                    "format": "password",
+                    "example": "password123"
+                  },
+                  "confirmPassword": {
                     "type": "string",
                     "format": "password",
                     "example": "password123"
@@ -220,6 +276,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
           "401": {
             "description": "Invalid credentials",
             "content": {
@@ -249,7 +315,7 @@
         "tags": ["Authentication"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "responses": {
@@ -301,12 +367,70 @@
         "tags": ["Authentication"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "responses": {
           "200": {
             "description": "User logged out successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/updatedetails": {
+      "put": {
+        "summary": "Update user details",
+        "tags": ["Authentication"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email",
+                    "example": "john@example.com"
+                  },
+                  "apiCallsCount": {
+                    "type": "integer",
+                    "example": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User details updated successfully",
             "content": {
               "application/json": {
                 "schema": {
@@ -316,9 +440,8 @@
                       "type": "boolean",
                       "example": true
                     },
-                    "message": {
-                      "type": "string",
-                      "example": "User logged out successfully"
+                    "data": {
+                      "$ref": "#/components/schemas/User"
                     }
                   }
                 }
@@ -327,6 +450,16 @@
           },
           "401": {
             "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
             "content": {
               "application/json": {
                 "schema": {
@@ -366,17 +499,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "If this email exists in our system, a password reset link has been sent"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Success"
                 }
               }
             }
@@ -443,17 +566,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Password has been reset successfully"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Success"
                 }
               }
             }
@@ -502,17 +615,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {
-                    "success": {
-                      "type": "boolean",
-                      "example": true
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "Token is valid"
-                    }
-                  }
+                  "$ref": "#/components/schemas/Success"
                 }
               }
             }
@@ -540,13 +643,56 @@
         }
       }
     },
+    "/admin/verify-access": {
+      "get": {
+        "summary": "Verify admin access",
+        "tags": ["Admin"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Admin access verified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Success"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized for admin role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/admin/stats": {
       "get": {
         "summary": "Get API usage statistics",
         "tags": ["Admin"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "responses": {
@@ -564,21 +710,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "endpoint": {
-                            "type": "string",
-                            "example": "/api/v1/auth/me"
-                          },
-                          "method": {
-                            "type": "string",
-                            "example": "GET"
-                          },
-                          "requestCount": {
-                            "type": "integer",
-                            "example": 42
-                          }
-                        }
+                        "$ref": "#/components/schemas/ApiStats"
                       }
                     }
                   }
@@ -625,7 +757,7 @@
         "tags": ["Admin"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "responses": {
@@ -643,25 +775,7 @@
                     "data": {
                       "type": "array",
                       "items": {
-                        "type": "object",
-                        "properties": {
-                          "userId": {
-                            "type": "string",
-                            "example": "60d21b4667d0d8992e610c85"
-                          },
-                          "email": {
-                            "type": "string",
-                            "example": "john@example.com"
-                          },
-                          "firstName": {
-                            "type": "string",
-                            "example": "John"
-                          },
-                          "totalRequests": {
-                            "type": "integer",
-                            "example": 15
-                          }
-                        }
+                        "$ref": "#/components/schemas/UserStats"
                       }
                     }
                   }
@@ -708,7 +822,7 @@
         "tags": ["Admin"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "responses": {
@@ -796,6 +910,101 @@
             }
           }
         }
+      },
+      "delete": {
+        "summary": "Delete multiple users",
+        "tags": ["Admin"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userIds"],
+                "properties": {
+                  "userIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["60d21b4667d0d8992e610c85", "60d21b4667d0d8992e610c86"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Users deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "count": {
+                      "type": "integer",
+                      "example": 2
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Successfully deleted 2 user(s)"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Not authorized for admin role",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/admin/users/{id}/role": {
@@ -804,7 +1013,7 @@
         "tags": ["Admin"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "parameters": [
@@ -946,7 +1155,7 @@
         "tags": ["Trivia"],
         "security": [
           {
-            "bearerAuth": []
+            "cookieAuth": []
           }
         ],
         "requestBody": {

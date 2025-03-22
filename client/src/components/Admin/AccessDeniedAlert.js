@@ -34,3 +34,5 @@ const AccessDeniedAlert = ({ onClose, redirectTimeout = 3 }) => {
 };
 
 export default AccessDeniedAlert;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

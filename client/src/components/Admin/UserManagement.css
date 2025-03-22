@@ -1,3 +1,58 @@
+/* User Management Styles */
+.user-management {
+  margin-top: 20px;
+}
+
+/* User role badges */
+.role-badge {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.role-badge.user {
+  background-color: #e5e7eb;
+  color: #4b5563;
+}
+
+.role-badge.admin {
+  background-color: #c7d2fe;
+  color: #4338ca;
+}
+
+/* Role change buttons */
+.role-button {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100px;
+}
+
+.role-button.promote {
+  background-color: #c7d2fe;
+  color: #4338ca;
+  border: 1px solid #818cf8;
+}
+
+.role-button.promote:hover {
+  background-color: #a5b4fc;
+}
+
+.role-button.demote {
+  background-color: #fecaca;
+  color: #b91c1c;
+  border: 1px solid #f87171;
+}
+
+.role-button.demote:hover {
+  background-color: #fca5a5;
+}
+
 /* User Management Delete Controls */
 .delete-controls {
   margin-bottom: 15px;

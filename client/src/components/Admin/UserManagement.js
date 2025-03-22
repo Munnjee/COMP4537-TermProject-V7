@@ -18,7 +18,7 @@ const UserManagement = ({ onUserUpdated }) => {
         // Get the current user ID
         const userData = await getCurrentUser();
         setCurrentUser(userData.id);
-        
+
         // Fetch all users
         await fetchUsers();
       } catch (error) {
@@ -26,7 +26,7 @@ const UserManagement = ({ onUserUpdated }) => {
         setError('Error loading user data');
       }
     };
-    
+
     initialize();
   }, []);
 
@@ -52,12 +52,12 @@ const UserManagement = ({ onUserUpdated }) => {
         user._id === userId ? { ...user, role: newRole } : user
       ));
       setSuccessMessage(`${messages.ROLE_UPDATED} ${newRole} successfully!`);
-      
+
       // Call the callback to update dashboard stats
       if (onUserUpdated) {
         onUserUpdated();
       }
-      
+
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -92,12 +92,12 @@ const UserManagement = ({ onUserUpdated }) => {
       // Remove deleted users from state
       setUsers(users.filter(user => !selectedUsers.includes(user._id)));
       setSuccessMessage(`Successfully deleted ${selectedUsers.length} user(s)`);
-      
+
       // Call the callback to update dashboard stats
       if (onUserUpdated) {
         onUserUpdated();
       }
-      
+
       // Reset selections
       setSelectedUsers([]);
       setTimeout(() => {
@@ -144,9 +144,9 @@ const UserManagement = ({ onUserUpdated }) => {
                 type="checkbox"
                 onChange={() => {
                   // Check if all selectable users are selected
-                  const allSelected = selectableUsers.length > 0 && 
+                  const allSelected = selectableUsers.length > 0 &&
                     selectableUsers.every(id => selectedUsers.includes(id));
-                  
+
                   if (allSelected) {
                     setSelectedUsers([]);
                   } else {
@@ -154,7 +154,7 @@ const UserManagement = ({ onUserUpdated }) => {
                   }
                 }}
                 checked={
-                  selectableUsers.length > 0 && 
+                  selectableUsers.length > 0 &&
                   selectableUsers.every(id => selectedUsers.includes(id))
                 }
                 disabled={selectableUsers.length === 0}
@@ -213,3 +213,5 @@ const UserManagement = ({ onUserUpdated }) => {
 };
 
 export default UserManagement;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

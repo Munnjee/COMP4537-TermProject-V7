@@ -13,10 +13,10 @@ const ResetPassword = () => {
   const [tokenValid, setTokenValid] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-  
+
   const { token } = useParams();
   const navigate = useNavigate();
-  
+
   const { password, confirmPassword } = formData;
 
   // Verify token on component mount
@@ -42,25 +42,25 @@ const ResetPassword = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate passwords
     if (password.length < 3) {
       setError(messages.PASSWORD_LENGTH);
       return;
     }
-    
+
     if (password !== confirmPassword) {
       setError(messages.PASSWORDS_DO_NOT_MATCH);
       return;
     }
-    
+
     setLoading(true);
     setError('');
-    
+
     try {
       const response = await api.post(`/auth/reset-password/${token}`, { password });
       setSuccess(true);
-      
+
       // Redirect to login after 3 seconds
       setTimeout(() => {
         navigate('/login');
@@ -98,7 +98,7 @@ const ResetPassword = () => {
   return (
     <div className="login-container">
       <h1>{messages.RESET_PASSWORD}</h1>
-      
+
       {success ? (
         <div className="success-message">
           <p>{messages.PASSWORD_RESET_SUCCESS}</p>
@@ -107,7 +107,7 @@ const ResetPassword = () => {
       ) : (
         <>
           {error && <div className="alert alert-danger">{error}</div>}
-          
+
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="password">{messages.NEW_PASSWORD}</label>
@@ -121,7 +121,7 @@ const ResetPassword = () => {
                 required
               />
             </div>
-            
+
             <div className="form-group">
               <label htmlFor="confirmPassword">{messages.CONFIRM_PASSWORD}</label>
               <input
@@ -134,12 +134,12 @@ const ResetPassword = () => {
                 required
               />
             </div>
-            
+
             <button className="home-button" type="submit" disabled={loading}>
               {loading ? messages.RESETTING_PASSWORD : messages.RESET_PASSWORD}
             </button>
           </form>
-          
+
           <p>
             <Link to="/login">{messages.RETURN_LOGIN}</Link>
           </p>

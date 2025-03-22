@@ -178,3 +178,5 @@ const AdminDashboard = ({ user, setUser }) => {
 };
 
 export default AdminDashboard;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

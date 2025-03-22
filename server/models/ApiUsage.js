@@ -97,3 +97,5 @@ ApiUsageSchema.statics.getUserStats = async function () {
 };
 
 module.exports = mongoose.model('ApiUsage', ApiUsageSchema);
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

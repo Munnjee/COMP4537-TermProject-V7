@@ -76,7 +76,7 @@ const Register = ({ setUser }) => {
             id="firstName"
             value={firstName}
             onChange={onChange}
-            placeholder= {messages.USER_NAME_PLACEHOLDER}
+            placeholder={messages.USER_NAME_PLACEHOLDER}
             required
           />
         </div>

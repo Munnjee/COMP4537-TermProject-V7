@@ -54,6 +54,23 @@
           "hasReachedLimit": {
             "type": "boolean",
             "example": false
+          },
+          "gameScores": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "accuracy": {
+                  "type": "number",
+                  "example": 80
+                },
+                "playedAt": {
+                  "type": "string",
+                  "format": "date-time",
+                  "example": "2023-04-28T09:12:33.001Z"
+                }
+              }
+            }
           }
         }
       },
@@ -138,6 +155,32 @@
           "totalRequests": {
             "type": "integer",
             "example": 15
+          }
+        }
+      },
+      "LeaderboardEntry": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string",
+            "example": "60d21b4667d0d8992e610c85"
+          },
+          "firstName": {
+            "type": "string",
+            "example": "John"
+          },
+          "averageAccuracy": {
+            "type": "number",
+            "example": 75.5
+          },
+          "gamesPlayed": {
+            "type": "integer",
+            "example": 5
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2023-04-28T09:12:33.001Z"
           }
         }
       }
@@ -1225,6 +1268,155 @@
           },
           "403": {
             "description": "API call limit reached",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scores": {
+      "post": {
+        "summary": "Save user game score",
+        "tags": ["Scores"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["accuracy"],
+                "properties": {
+                  "accuracy": {
+                    "type": "number",
+                    "example": 80,
+                    "description": "The percentage accuracy score achieved in the game"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Score saved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Score saved successfully"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "accuracy": {
+                          "type": "number",
+                          "example": 80
+                        },
+                        "averageAccuracy": {
+                          "type": "number",
+                          "example": 75
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing score data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/scores/leaderboard": {
+      "get": {
+        "summary": "Get leaderboard data",
+        "tags": ["Scores"],
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leaderboard data retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/LeaderboardEntry"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authorized",
             "content": {
               "application/json": {
                 "schema": {

@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import './Game.css';
 import confetti from 'canvas-confetti';
 import messages from '../../utils/messages';
+import { saveScore as saveScoreAPI } from '../../services/scoreService';
+import Leaderboard from './Leaderboard';
+import { getCurrentUser } from '../../services/authService';
 
 const Game = () => {
   // Add messages prop
@@ -22,9 +25,23 @@ const Game = () => {
   const [questionResult, setQuestionResult] = useState(null); // 'correct' or 'wrong'
   const [results, setResults] = useState([]);
   const [isExiting, setIsExiting] = useState(false);
+  const [activeTab, setActiveTab] = useState('results');
+  const [savedScore, setSavedScore] = useState(false);
+  const [user, setUser] = useState(null);
 
   const timerRef = useRef(null);
   const containerRef = useRef(null);
+  const questionProcessedRef = useRef(false);
+
+  // Fetch user data
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getCurrentUser();
+      setUser(userData);
+    };
+    
+    fetchUser();
+  }, []);
 
   // Check if questions exist, if not, redirect to home
   useEffect(() => {
@@ -58,6 +75,21 @@ const Game = () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [currentQuestionIndex, gameOver]);
+
+  // Calculate accuracy and save score when game is over
+  useEffect(() => {
+    if (gameOver && !savedScore && results.length > 0) {
+      const correctAnswers = results.filter((r) => r.isCorrect).length;
+      const calculatedAccuracy = Math.round((correctAnswers / questions.length) * 100);
+      
+      const handleSaveScore = async () => {
+        await saveScoreAPI(calculatedAccuracy);
+        setSavedScore(true);
+      };
+      
+      handleSaveScore();
+    }
+  }, [gameOver, savedScore, results, questions.length]);
 
   // Handle time up scenario
   const handleTimeUp = () => {
@@ -135,8 +167,6 @@ const Game = () => {
     }, 2000);
   };
 
-  const questionProcessedRef = useRef(false);
-
   const moveToNextQuestion = () => {
     if (currentQuestionIndex === questions.length - 1) {
       // End of quiz
@@ -178,73 +208,99 @@ const Game = () => {
         <div className='results-card'>
           <div className='results-header'>
             <h1>{messages.QUIZ_COMPLETE}</h1>
-            <div className='topic-badge'>{topic}</div>
           </div>
 
-          <div className='score-section'>
-            <div className='final-score'>
-              <div className='score-value'>{score}</div>
-              <div className='max-score'>/ {questions.length * 20}</div>
-            </div>
+          <div className="results-tabs">
+            <button 
+              className={`tab-button ${activeTab === 'results' ? 'active' : ''}`}
+              onClick={() => setActiveTab('results')}
+            >
+              {messages.RESULTS_TAB}
+            </button>
+            <button 
+              className={`tab-button ${activeTab === 'leaderboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('leaderboard')}
+            >
+               {messages.LEADERBOARD_TAB}
+            </button>
+          </div>
 
-            <div className='stats-grid'>
-              <div className='stat-box'>
-                <div className='stat-value'>{correctAnswers}</div>
-                <div className='stat-label'>{messages.CORRECT}</div>
-              </div>
-              <div className='stat-box'>
-                <div className='stat-value'>
-                  {questions.length - correctAnswers}
+          {activeTab === 'results' && (
+            <div className='topic-badge-container'>
+              <div className='topic-badge'>{topic}</div>
+            </div>
+          )}
+
+          {activeTab === 'results' ? (
+            <>
+              <div className='score-section'>
+                <div className='final-score'>
+                  <div className='score-value'>{score}</div>
+                  <div className='max-score'>/ {questions.length * 20}</div>
                 </div>
-                <div className='stat-label'>{messages.WRONG}</div>
-              </div>
-              <div className='stat-box'>
-                <div className='stat-value'>{accuracy}%</div>
-                <div className='stat-label'>{messages.ACCURACY}</div>
-              </div>
-            </div>
-          </div>
 
-          <div className='questions-review'>
-            <h3>{messages.QUESTION_REVIEW}</h3>
-            <div className='review-list'>
-              {results.map((result, index) => (
-                <div
-                  key={index}
-                  className={`review-item ${
-                    result.isCorrect ? 'correct' : 'wrong'
-                  }`}
-                >
-                  <div className='review-number'>{index + 1}</div>
-                  <div className='review-content'>
-                    <div className='review-question'>{result.question}</div>
-                    <div className='review-answers'>
-                      {result.isCorrect ? (
-                        <span className='review-correct'>
-                          {messages.CORRECT_ANSWER_FEEDBACK}
-                        </span>
-                      ) : result.selectedAnswer === 'timeout' ? (
-                        <span className='review-wrong'>
-                          {messages.TIMEOUT_FEEDBACK} {result.correctAnswer}
-                        </span>
-                      ) : (
-                        <span className='review-wrong'>
-                          {messages.YOU_ANSWERED}{' '}
-                          <span className='selected'>
-                            {result.selectedAnswer}
-                          </span>
-                          &nbsp;&nbsp; &nbsp;&nbsp;{messages.CORRECT_ANSWER}{' '}
-                          <span className='correct-text'>
-                            {result.correctAnswer}
-                          </span>
-                        </span>
-                      )}
+                <div className='stats-grid'>
+                  <div className='stat-box'>
+                    <div className='stat-value'>{correctAnswers}</div>
+                    <div className='stat-label'>{messages.CORRECT}</div>
+                  </div>
+                  <div className='stat-box'>
+                    <div className='stat-value'>
+                      {questions.length - correctAnswers}
                     </div>
+                    <div className='stat-label'>{messages.WRONG}</div>
+                  </div>
+                  <div className='stat-box'>
+                    <div className='stat-value'>{accuracy}%</div>
+                    <div className='stat-label'>{messages.ACCURACY}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
+
+              <div className='questions-review'>
+                <h3>{messages.QUESTION_REVIEW}</h3>
+                <div className='review-list'>
+                  {results.map((result, index) => (
+                    <div
+                      key={index}
+                      className={`review-item ${
+                        result.isCorrect ? 'correct' : 'wrong'
+                      }`}
+                    >
+                      <div className='review-number'>{index + 1}</div>
+                      <div className='review-content'>
+                        <div className='review-question'>{result.question}</div>
+                        <div className='review-answers'>
+                          {result.isCorrect ? (
+                            <span className='review-correct'>
+                              {messages.CORRECT_ANSWER_FEEDBACK}
+                            </span>
+                          ) : result.selectedAnswer === 'timeout' ? (
+                            <span className='review-wrong'>
+                              {messages.TIMEOUT_FEEDBACK} {result.correctAnswer}
+                            </span>
+                          ) : (
+                            <span className='review-wrong'>
+                              {messages.YOU_ANSWERED}{' '}
+                              <span className='selected'>
+                                {result.selectedAnswer}
+                              </span>
+                              &nbsp;&nbsp; &nbsp;&nbsp;{messages.CORRECT_ANSWER}{' '}
+                              <span className='correct-text'>
+                                {result.correctAnswer}
+                              </span>
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </>
+          ) : (
+            <Leaderboard currentUserId={user?._id} />
+          )}
 
           <button className='play-again-btn' onClick={handlePlayAgain}>
             <span className='btn-icon'>🏠</span>

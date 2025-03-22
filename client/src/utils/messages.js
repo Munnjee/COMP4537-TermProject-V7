@@ -115,6 +115,17 @@ const messages = {
   CORRECT_POINTS: 'Correct! +20 points',
   TIMES_UP: "Time's up! The correct answer is:",
 
+  // Leaderboard messages
+  LEADERBOARD_TITLE: '🏆 Top Players',
+  KEEP_PRACTICING: 'Keep practicing to make the leaderboard!',
+  FIRST_LEADERBOARD: 'Be the first to make the leaderboard!',
+  GAMES_PLAYED_SINGULAR: 'game',
+  GAMES_PLAYED_PLURAL: 'games',
+
+  // Tab labels
+  RESULTS_TAB: 'Your Results',
+  LEADERBOARD_TAB: 'Leaderboard',
+
   // Game error messages
   QUESTIONS_GENERATION_FAILED: "Couldn't generate questions. Please try again or choose another topic.",
   QUESTIONS_GENERATION_ERROR: 'An error occurred while generating questions. Please try again.',

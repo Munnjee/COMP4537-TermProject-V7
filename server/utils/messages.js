@@ -34,4 +34,8 @@ module.exports = {
   MISSING_TOPIC: 'Please provide a topic for trivia questions',
   TRIVIA_SYSTEM_PROMPT: 'You are a trivia game generator. Create {count} trivia questions about {topic}. Format the response as a JSON array with each question having these properties: question, options (array of 4 choices), correctAnswer (the correct option text in the options array).',
   TRIVIA_USER_PROMPT: 'Generate {count} trivia questions about {topic}',
+
+  // Leaderboard messages
+  MISSING_SCORE_DATA: 'Accuracy score is required',
+  SCORE_SAVED: 'Score saved successfully',
 };

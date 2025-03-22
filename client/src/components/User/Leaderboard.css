@@ -1,0 +1,114 @@
+.leaderboard-container {
+    padding: 20px;
+    background-color: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    margin-top: 30px;
+    animation: fadeIn 0.5s;
+  }
+  
+  .leaderboard-title {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #6c5ce7;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+  
+  .user-rank-container {
+    background-color: rgba(99, 102, 241, 0.1);
+    padding: 12px 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+  
+  .user-rank {
+    color: #6c5ce7;
+    font-weight: 700;
+    margin: 0;
+  }
+  
+  .user-rank-message {
+    color: #64748b;
+    margin: 0;
+  }
+  
+  .leaderboard-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .leaderboard-item {
+    display: grid;
+    grid-template-columns: 50px 1fr 80px 100px;
+    gap: 10px;
+    padding: 12px 15px;
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    align-items: center;
+    transition: transform 0.2s;
+  }
+  
+  .leaderboard-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .leaderboard-item.current-user {
+    background-color: rgba(99, 102, 241, 0.1);
+    border-left: 4px solid #6c5ce7;
+  }
+  
+  .rank {
+    font-weight: 700;
+    color: #64748b;
+  }
+  
+  .player-name {
+    font-weight: 600;
+    color: #2d3748;
+  }
+  
+  .accuracy {
+    font-weight: 700;
+    color: #6c5ce7;
+  }
+  
+  .games-played {
+    color: #64748b;
+    font-size: 0.9rem;
+  }
+
+  .games-played::before {
+    display: none;
+  }
+  
+  .leaderboard-loading,
+  .leaderboard-error,
+  .no-scores {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+  }
+  
+  /* Scrollbar styling */
+  .leaderboard-list::-webkit-scrollbar {
+    width: 5px;
+  }
+  
+  .leaderboard-list::-webkit-scrollbar-track {
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 10px;
+  }
+  
+  .leaderboard-list::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.5);
+    border-radius: 10px;
+  }
+
+/* Attribution: Claude 3.7 Sonnet and Copilot were used to assist in writing the code. */

@@ -12,6 +12,7 @@ const config = require('./config/config');
 const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
+const scoreRoutes = require('./routes/scoreRoutes');
 const { trackApiUsage } = require('./middleware/auth');
 
 const app = express();
@@ -55,6 +56,7 @@ app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes);
 app.use('/api/v1/trivia', apiRoutes);
+app.use('/api/v1/scores', scoreRoutes);
 
 // 404 handler
 app.use((req, res, next) => {

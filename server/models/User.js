@@ -33,6 +33,16 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  gameScores: [{
+    accuracy: {
+      type: Number,
+      required: true,
+    },
+    playedAt: {
+      type: Date,
+      default: Date.now,
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now,

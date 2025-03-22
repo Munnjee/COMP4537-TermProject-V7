@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../../services/authService';
-import { getApiStats, getUserStats } from '../../services/adminService';
+import { getApiStats, getUserStats, verifyAdminAccess } from '../../services/adminService';
 import UserManagement from './UserManagement';
+import AccessDeniedAlert from './AccessDeniedAlert';
 import messages from '../../utils/messages';
 
 const AdminDashboard = ({ user, setUser }) => {
@@ -11,9 +12,25 @@ const AdminDashboard = ({ user, setUser }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('endpoints');
+  const [adminAccessVerified, setAdminAccessVerified] = useState(false);
+  const [showAccessDenied, setShowAccessDenied] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const checkAdminAccess = async () => {
+      try {
+        await verifyAdminAccess();
+        setAdminAccessVerified(true);
+        fetchStats();
+      } catch (err) {
+        console.error('Admin access verification failed:', err);
+        if (err.response && err.response.status === 403) {
+          setShowAccessDenied(true);
+          setLoading(false);
+        }
+      }
+    };
+
     const fetchStats = async () => {
       try {
         setLoading(true);
@@ -21,7 +38,7 @@ const AdminDashboard = ({ user, setUser }) => {
           getApiStats(),
           getUserStats()
         ]);
-        
+
         setEndpointStats(endpointRes.data);
         setUserStats(userRes.data);
         setError('');
@@ -33,8 +50,8 @@ const AdminDashboard = ({ user, setUser }) => {
       }
     };
 
-    fetchStats();
-  }, []);
+    checkAdminAccess();
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
@@ -46,6 +63,14 @@ const AdminDashboard = ({ user, setUser }) => {
     }
   };
 
+  const handleRedirectToHome = () => {
+    navigate('/');
+  };
+
+  if (showAccessDenied) {
+    return <AccessDeniedAlert onClose={handleRedirectToHome} redirectTimeout={5} />;
+  }
+
   if (loading) {
     return <div className="loading">Loading statistics...</div>;
   }
@@ -53,30 +78,30 @@ const AdminDashboard = ({ user, setUser }) => {
   return (
     <div className="admin-dashboard">
       <h1>Admin Dashboard</h1>
-      
+
       <div className="admin-tabs">
-        <button 
+        <button
           className={`tab-button ${activeTab === 'endpoints' ? 'active' : ''}`}
           onClick={() => setActiveTab('endpoints')}
         >
           API Endpoints Stats
         </button>
-        <button 
+        <button
           className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
           User API Usage
         </button>
-        <button 
+        <button
           className={`tab-button ${activeTab === 'management' ? 'active' : ''}`}
           onClick={() => setActiveTab('management')}
         >
           User Management
         </button>
       </div>
-      
+
       {error && <div className="error-message">{error}</div>}
-      
+
       <div className="stats-container">
         {activeTab === 'endpoints' && (
           <div className="endpoints-stats">
@@ -107,7 +132,7 @@ const AdminDashboard = ({ user, setUser }) => {
             </table>
           </div>
         )}
-        
+
         {activeTab === 'users' && (
           <div className="users-stats">
             <h2>User API Usage</h2>
@@ -137,12 +162,12 @@ const AdminDashboard = ({ user, setUser }) => {
             </table>
           </div>
         )}
-        
+
         {activeTab === 'management' && (
           <UserManagement />
         )}
       </div>
-      
+
       <button className="logout-button" onClick={handleLogout}>
         Logout
       </button>

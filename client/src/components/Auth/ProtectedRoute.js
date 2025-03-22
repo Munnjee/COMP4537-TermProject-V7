@@ -1,23 +1,13 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import messages from '../../utils/messages';
 
-const ProtectedRoute = ({ user, children, adminOnly = false }) => {
+const ProtectedRoute = ({ user, children }) => {
   // Not authenticated
   if (!user) {
     return <Navigate to="/login" />;
   }
   
-  // Admin route check
-  if (adminOnly && user.role !== 'admin') {
-    return (
-      <div className="unauthorized">
-        <h2>{messages.ADMIN_ONLY}</h2>
-        <p>You don't have permission to access this page.</p>
-      </div>
-    );
-  }
-  
+  // User is authenticated, render the children
   return children;
 };
 

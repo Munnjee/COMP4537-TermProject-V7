@@ -88,7 +88,7 @@ const App = () => {
           <Route
             path='/admin/dashboard'
             element={
-              <ProtectedRoute user={user} adminOnly={true}>
+              <ProtectedRoute user={user}>
                 <AdminDashboard user={user} setUser={setUser} />
               </ProtectedRoute>
             }
@@ -103,7 +103,7 @@ const App = () => {
           />
           {/* Default Route */}
           <Route
-            path='/'
+            path='*'
             element={
               user ? (
                 <Navigate

@@ -1,5 +1,15 @@
 import api from './authService';
 
+// Verify admin access
+export const verifyAdminAccess = async () => {
+  try {
+    const response = await api.get('/admin/verify-access');
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Get API stats
 export const getApiStats = async () => {
   try {

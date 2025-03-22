@@ -4,6 +4,7 @@ const {
   getUserStats,
   getUsers,
   updateUserRole,
+  deleteUsers
 } = require('../controllers/adminController');
 const { protect, authorize } = require('../middleware/auth');
 
@@ -24,5 +25,6 @@ router.get('/stats', getApiStats);
 router.get('/users/stats', getUserStats);
 router.get('/users', getUsers);
 router.put('/users/:id/role', updateUserRole);
+router.delete('/users', deleteUsers);
 
 module.exports = router;

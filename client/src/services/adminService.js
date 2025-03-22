@@ -50,4 +50,16 @@ export const updateUserRole = async (userId, role) => {
   }
 };
 
+// Delete multiple users
+export const deleteUsers = async (userIds) => {
+  try {
+    const response = await api.delete('/admin/users', { 
+      data: { userIds } 
+    });
+    return response.data;
+  } catch (error) {
+    throw error.response ? error.response.data : { message: 'Network error' };
+  }
+};
+
 // Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

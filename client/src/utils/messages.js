@@ -75,6 +75,14 @@ const messages = {
   MAKE_ADMIN: 'Make Admin',
   MAKE_USER: 'Make User',
   ERROR_UPDATING_ROLE: 'Error updating user role',
+  
+  // User management messages
+  DELETE_USERS: 'Delete Selected',
+  DELETE_USERS_CONFIRM: 'Are you sure you want to delete the selected users?',
+  DELETE_USERS_SUCCESS: 'Successfully deleted users',
+  DELETE_USERS_ERROR: 'Error deleting users',
+  CANNOT_DELETE_SELF: 'You cannot delete your own account',
+  NO_USERS_SELECTED: 'No users selected for deletion',
 
   // Homepage messages
   APP_TITLE: "Let's TRIVIA",

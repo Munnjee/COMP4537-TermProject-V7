@@ -1,0 +1,59 @@
+/* User Management Delete Controls */
+.delete-controls {
+  margin-bottom: 15px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.delete-button {
+  background-color: var(--danger-color);
+  color: white;
+  padding: 8px 15px;
+  border-radius: var(--radius);
+  border: none;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  width: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.delete-button:hover {
+  background-color: #b91c1c;
+  transform: translateY(-2px);
+}
+
+.delete-button:before {
+  margin-right: 8px;
+  font-size: 1rem;
+}
+
+/* Checkbox styling */
+.stats-table input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+}
+
+.current-user-indicator {
+  font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  opacity: 0.7;
+}
+
+/* Selection row styling */
+.stats-table tr.selected {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.stats-table tr:hover {
+  background-color: rgba(79, 70, 229, 0.05);
+}
+
+.stats-table tr.selected:hover {
+  background-color: rgba(79, 70, 229, 0.15);
+}

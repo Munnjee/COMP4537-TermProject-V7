@@ -106,4 +106,51 @@ exports.updateUserRole = async (req, res, next) => {
   }
 };
 
+// @desc    Delete multiple users
+// @route   DELETE /api/v1/admin/users
+// @access  Private/Admin
+exports.deleteUsers = async (req, res, next) => {
+  try {
+    const { userIds } = req.body;
+    
+    // Validate userIds
+    if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide valid user IDs to delete',
+      });
+    }
+    
+    // Prevent deleting the current admin user
+    if (userIds.includes(req.user.id.toString())) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot delete your own account',
+      });
+    }
+    
+    // Delete users
+    const result = await User.deleteMany({
+      _id: { $in: userIds }
+    });
+    
+    // Also delete associated API usage data
+    await ApiUsage.deleteMany({
+      user: { $in: userIds }
+    });
+    
+    res.status(200).json({
+      success: true,
+      count: result.deletedCount,
+      message: `Successfully deleted ${result.deletedCount} user(s)`,
+    });
+  } catch (error) {
+    console.error('Delete users error:', error);
+    res.status(500).json({
+      success: false,
+      message: messages.SERVER_ERROR,
+    });
+  }
+};
+
 // Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

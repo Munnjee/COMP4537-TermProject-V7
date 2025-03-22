@@ -1,23 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
-import { getCurrentUser } from "./services/authService";
+} from 'react-router-dom';
+import { getCurrentUser } from './services/authService';
 
 // Components
-import Login from "./components/Auth/Login";
-import Register from "./components/Auth/Register";
-import ForgotPassword from "./components/Auth/ForgotPassword";
-import ResetPassword from "./components/Auth/ResetPassword";
-import UserHomepage from "./components/User/Homepage";
-import AdminDashboard from "./components/Admin/Dashboard";
-import ProtectedRoute from "./components/Auth/ProtectedRoute";
+import Login from './components/Auth/Login';
+import Register from './components/Auth/Register';
+import ForgotPassword from './components/Auth/ForgotPassword';
+import ResetPassword from './components/Auth/ResetPassword';
+import UserHomepage from './components/User/Homepage';
+import AdminDashboard from './components/Admin/Dashboard';
+import ProtectedRoute from './components/Auth/ProtectedRoute';
+import Game from './components/User/Game';
 
 // CSS
-import "./App.css";
+import './App.css';
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -30,7 +31,7 @@ const App = () => {
         const userData = await getCurrentUser();
         setUser(userData);
       } catch (error) {
-        console.error("Error checking user:", error);
+        console.error('Error checking user:', error);
       } finally {
         setLoading(false);
       }
@@ -40,20 +41,20 @@ const App = () => {
   }, []);
 
   if (loading) {
-    return <div className="loading-app">Loading...</div>;
+    return <div className='loading-app'>Loading...</div>;
   }
 
   return (
     <Router>
-      <div className="app">
+      <div className='app'>
         <Routes>
           {/* Public Routes */}
           <Route
-            path="/login"
+            path='/login'
             element={
               user ? (
                 <Navigate
-                  to={user.role === "admin" ? "/admin/dashboard" : "/"}
+                  to={user.role === 'admin' ? '/admin/dashboard' : '/'}
                 />
               ) : (
                 <Login setUser={setUser} />
@@ -61,23 +62,23 @@ const App = () => {
             }
           />
           <Route
-            path="/register"
+            path='/register'
             element={
-              user ? <Navigate to="/" /> : <Register setUser={setUser} />
+              user ? <Navigate to='/' /> : <Register setUser={setUser} />
             }
           />
           <Route
-            path="/forgot-password"
-            element={user ? <Navigate to="/" /> : <ForgotPassword />}
+            path='/forgot-password'
+            element={user ? <Navigate to='/' /> : <ForgotPassword />}
           />
           <Route
-            path="/reset-password/:token"
-            element={user ? <Navigate to="/" /> : <ResetPassword />}
+            path='/reset-password/:token'
+            element={user ? <Navigate to='/' /> : <ResetPassword />}
           />
 
           {/* Protected Routes */}
           <Route
-            path="/"
+            path='/'
             element={
               <ProtectedRoute user={user}>
                 <UserHomepage user={user} setUser={setUser} />
@@ -85,24 +86,31 @@ const App = () => {
             }
           />
           <Route
-            path="/admin/dashboard"
+            path='/admin/dashboard'
             element={
               <ProtectedRoute user={user} adminOnly={true}>
                 <AdminDashboard user={user} setUser={setUser} />
               </ProtectedRoute>
             }
           />
-
+          <Route
+            path='/game'
+            element={
+              <ProtectedRoute user={user}>
+                <Game />
+              </ProtectedRoute>
+            }
+          />
           {/* Default Route */}
           <Route
-            path="/"
+            path='/'
             element={
               user ? (
                 <Navigate
-                  to={user.role === "admin" ? "/admin/dashboard" : "/"}
+                  to={user.role === 'admin' ? '/admin/dashboard' : '/'}
                 />
               ) : (
-                <Navigate to="/login" />
+                <Navigate to='/login' />
               )
             }
           />

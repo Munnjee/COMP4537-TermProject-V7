@@ -65,35 +65,35 @@ exports.authorize = (...roles) => {
 
 // Track API usage
 exports.trackApiUsage = async (req, res, next) => {
-  // Skip tracking for auth routes
-  if (req.path.startsWith('/api/v1/auth/')) {
+  // Skip tracking for auth routes and admin GET requests
+  if (
+    req.originalUrl.startsWith('/api/v1/auth/') || 
+    (req.originalUrl.startsWith('/api/v1/admin/') && req.method === 'GET')
+  ) {
     return next();
   }
-
+  
   try {
     if (req.user) {
-      // Always record API usage for analytics purposes
+      // Record API usage for analytics purposes
       await ApiUsage.create({
-        endpoint: req.path,
+        endpoint: req.originalUrl,
         method: req.method,
         user: req.user._id,
       });
 
-      // Only increment API call count for non-admin users
-      if (req.user.role !== 'admin') {
-        // Increment user's API call count
-        await User.findByIdAndUpdate(req.user._id, {
-          $inc: { apiCallsCount: 1 },
-        });
+      // Increment apiCallsCount for all users including admins
+      await User.findByIdAndUpdate(req.user._id, {
+        $inc: { apiCallsCount: 1 },
+      });
 
-        // Update user object in request
-        req.user = await User.findById(req.user._id);
+      // Update user object in request
+      req.user = await User.findById(req.user._id);
 
-        // Check if user has reached API limit
-        if (req.user.hasReachedApiLimit()) {
-          // We continue providing service but with a warning
-          req.apiLimitReached = true;
-        }
+      // Check if user has reached API limit (only affects non-admin users)
+      if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
+        // We continue providing service but with a warning
+        req.apiLimitReached = true;
       }
     }
     next();

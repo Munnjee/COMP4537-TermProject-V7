@@ -6,13 +6,15 @@ const {
   updateUserRole,
   deleteUsers
 } = require('../controllers/adminController');
-const { protect, authorize } = require('../middleware/auth');
+const { protect, authorize, trackApiUsage } = require('../middleware/auth');
+
 
 const router = express.Router();
 
 // Protect all routes in this router
 router.use(protect);
 router.use(authorize('admin'));
+router.use(trackApiUsage); 
 
 router.get('/verify-access', (req, res) => {
   res.status(200).json({

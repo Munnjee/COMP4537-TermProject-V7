@@ -21,27 +21,42 @@ const ApiUsageSchema = new mongoose.Schema({
   },
 });
 
+// Helper function to normalize endpoint paths
+const normalizeEndpoint = (endpoint) => {
+  // Replace MongoDB ObjectId pattern with {id}
+  // Match the pattern /5f8d0d55b54764421b7156c1 (24 hex chars)
+  return endpoint.replace(/\/[0-9a-fA-F]{24}(\/|$)/g, '/{id}$1');
+};
+
 // Static method to get endpoint stats
 ApiUsageSchema.statics.getEndpointStats = async function () {
-  return this.aggregate([
-    {
-      $group: {
-        _id: { endpoint: '$endpoint', method: '$method' },
-        count: { $sum: 1 },
-      },
-    },
-    {
-      $project: {
-        _id: 0,
-        endpoint: '$_id.endpoint',
-        method: '$_id.method',
-        requestCount: '$count',
-      },
-    },
-    {
-      $sort: { endpoint: 1, method: 1 },
-    },
-  ]);
+  // Get all records
+  const results = await this.find({}, 'endpoint method');
+  
+  // Normalize and count
+  const stats = {};
+  
+  results.forEach(record => {
+    const normalizedEndpoint = normalizeEndpoint(record.endpoint);
+    const key = `${record.method}:${normalizedEndpoint}`;
+    
+    if (!stats[key]) {
+      stats[key] = {
+        method: record.method,
+        endpoint: normalizedEndpoint,
+        requestCount: 0
+      };
+    }
+    
+    stats[key].requestCount++;
+  });
+  
+  // Convert to array and sort
+  return Object.values(stats).sort((a, b) => {
+    const endpointComparison = a.endpoint.localeCompare(b.endpoint);
+    if (endpointComparison !== 0) return endpointComparison;
+    return a.method.localeCompare(b.method);
+  });
 };
 
 // Static method to get user stats
@@ -82,5 +97,3 @@ ApiUsageSchema.statics.getUserStats = async function () {
 };
 
 module.exports = mongoose.model('ApiUsage', ApiUsageSchema);
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

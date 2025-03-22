@@ -124,7 +124,7 @@ exports.getMe = async (req, res, next) => {
 // @access  Private
 exports.logout = (req, res, next) => {
   res.cookie('token', 'none', {
-    expires: new Date(Date.now() + 10 * 1000),
+    expires: new Date(0),
     httpOnly: true,
   });
 

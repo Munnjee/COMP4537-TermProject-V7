@@ -46,7 +46,7 @@
 }
 
 /* Selection row styling */
-.stats-table tr.selected {
+.stats-table tr.delete-selected {
   background-color: rgba(79, 70, 229, 0.1);
 }
 
@@ -54,6 +54,6 @@
   background-color: rgba(79, 70, 229, 0.05);
 }
 
-.stats-table tr.selected:hover {
+.stats-table tr.delete-selected:hover {
   background-color: rgba(79, 70, 229, 0.15);
 }

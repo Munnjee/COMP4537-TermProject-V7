@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, updateUserRole, deleteUsers } from '../../services/adminService';
+import { getCurrentUser } from '../../services/authService';
 import messages from '../../utils/messages';
 import './UserManagement.css';
 
@@ -12,10 +13,21 @@ const UserManagement = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
-    fetchUsers();
-    // Get current user ID from localStorage or session
-    const user = JSON.parse(localStorage.getItem('user')) || {};
-    setCurrentUser(user.id);
+    const initialize = async () => {
+      try {
+        // Get the current user ID
+        const userData = await getCurrentUser();
+        setCurrentUser(userData.id);
+        
+        // Fetch all users
+        await fetchUsers();
+      } catch (error) {
+        console.error('Error initializing:', error);
+        setError('Error loading user data');
+      }
+    };
+    
+    initialize();
   }, []);
 
   const fetchUsers = async () => {
@@ -39,7 +51,7 @@ const UserManagement = () => {
       setUsers(users.map(user =>
         user._id === userId ? { ...user, role: newRole } : user
       ));
-      setSuccessMessage(`${messages.ROLE_UPDATED} to ${newRole} successfully!`);
+      setSuccessMessage(`${messages.ROLE_UPDATED} ${newRole} successfully!`);
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
@@ -64,7 +76,7 @@ const UserManagement = () => {
 
   const handleDeleteSelected = async () => {
     if (selectedUsers.length === 0) {
-      setError('No users selected for deletion');
+      setError(messages.NO_USERS_SELECTED);
       setTimeout(() => setError(''), 3000);
       return;
     }
@@ -86,6 +98,9 @@ const UserManagement = () => {
       }, 3000);
     }
   };
+
+  // Get the list of selectable users (exclude current user)
+  const selectableUsers = users.filter(user => user._id !== currentUser).map(user => user._id);
 
   if (loading) {
     return <div className="loading">{messages.LOADING}</div>;
@@ -112,18 +127,27 @@ const UserManagement = () => {
       <table className="stats-table">
         <thead>
           <tr>
-            <th><input
-              type="checkbox"
-              onChange={() => {
-                // Select all except current user
-                if (selectedUsers.length === users.filter(user => user._id !== currentUser).length) {
-                  setSelectedUsers([]);
-                } else {
-                  setSelectedUsers(users.filter(user => user._id !== currentUser).map(user => user._id));
+            <th>
+              <input
+                type="checkbox"
+                onChange={() => {
+                  // Check if all selectable users are selected
+                  const allSelected = selectableUsers.length > 0 && 
+                    selectableUsers.every(id => selectedUsers.includes(id));
+                  
+                  if (allSelected) {
+                    setSelectedUsers([]);
+                  } else {
+                    setSelectedUsers(selectableUsers);
+                  }
+                }}
+                checked={
+                  selectableUsers.length > 0 && 
+                  selectableUsers.every(id => selectedUsers.includes(id))
                 }
-              }}
-              checked={selectedUsers.length > 0 && selectedUsers.length === users.filter(user => user._id !== currentUser).length}
-            /></th>
+                disabled={selectableUsers.length === 0}
+              />
+            </th>
             <th>{messages.USER_NAME}</th>
             <th>{messages.EMAIL}</th>
             <th>{messages.ROLE}</th>
@@ -134,16 +158,16 @@ const UserManagement = () => {
         <tbody>
           {users.length > 0 ? (
             users.map((user) => (
-              <tr key={user._id}>
+              <tr key={user._id} className={selectedUsers.includes(user._id) ? 'delete-selected' : ''}>
                 <td>
-                  {user._id !== currentUser ? (
+                  {user._id === currentUser ? (
+                    <span className="current-user-indicator" title="Current user">👤</span>
+                  ) : (
                     <input
                       type="checkbox"
                       checked={selectedUsers.includes(user._id)}
                       onChange={() => handleCheckboxChange(user._id)}
                     />
-                  ) : (
-                    <span className="current-user-indicator" title="Current user">👤</span>
                   )}
                 </td>
                 <td>{user.firstName}</td>
@@ -158,6 +182,7 @@ const UserManagement = () => {
                   <button
                     className={`role-button ${user.role === 'user' ? 'promote' : 'demote'}`}
                     onClick={() => handleRoleChange(user._id, user.role)}
+                    disabled={user._id === currentUser}
                   >
                     {user.role === 'user' ? messages.MAKE_ADMIN : messages.MAKE_USER}
                   </button>

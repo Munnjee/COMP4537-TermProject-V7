@@ -44,6 +44,26 @@ const messages = {
   START_GAME: 'Start Game',
   LOADING: 'Loading...',
 
+  // Game messages
+  DEFAULT_TOPIC: 'General Knowledge',
+  LOADING_QUIZ: 'Loading quiz...',
+  SCORE: 'SCORE',
+  TIME_LEFT: 'TIME LEFT',
+  QUIZ_COMPLETE: 'Quiz Complete!',
+  CORRECT: 'Correct',
+  WRONG: 'Wrong',
+  ACCURACY: 'Accuracy',
+  QUESTION_REVIEW: 'Question Review',
+  PLAY_AGAIN: 'Play Again',
+  CORRECT_ANSWER_FEEDBACK: 'You got it right! ✓',
+  TIMEOUT_FEEDBACK: "Time's up! The answer was:",
+  YOU_ANSWERED: 'You answered:',
+  CORRECT_ANSWER: 'Correct answer:',
+  STREAK_MESSAGE: '{count} in a row!',
+  CORRECT_POINTS: 'Correct! +20 points',
+  INCORRECT_ANSWER: 'Incorrect! The correct answer is:',
+  TIMES_UP: "Time's up! The correct answer is:",
+
   // Error alerts
   QUESTIONS_GENERATION_FAILED:
     "Couldn't generate questions. Please try again or choose another topic.",

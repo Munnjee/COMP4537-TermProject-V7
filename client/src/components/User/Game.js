@@ -2,11 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import './Game.css';
 import confetti from 'canvas-confetti';
+import messages from '../../utils/messages';
 
 const Game = () => {
+  // Add messages prop
   const location = useLocation();
   const navigate = useNavigate();
-  const { questions = [], topic = 'General Knowledge' } = location.state || {};
+  const { questions = [], topic = messages.DEFAULT_TOPIC } =
+    location.state || {};
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
@@ -156,7 +159,7 @@ const Game = () => {
 
   // If no questions or navigated directly, show loading
   if (!questions || questions.length === 0) {
-    return <div className='loading-game'>Loading quiz...</div>;
+    return <div className='loading-game'>{messages.LOADING_QUIZ}</div>;
   }
 
   // Game Over Screen
@@ -168,7 +171,7 @@ const Game = () => {
       <div className='game-container game-over' ref={containerRef}>
         <div className='results-card'>
           <div className='results-header'>
-            <h1>Quiz Complete!</h1>
+            <h1>{messages.QUIZ_COMPLETE}</h1>
             <div className='topic-badge'>{topic}</div>
           </div>
 
@@ -181,23 +184,23 @@ const Game = () => {
             <div className='stats-grid'>
               <div className='stat-box'>
                 <div className='stat-value'>{correctAnswers}</div>
-                <div className='stat-label'>Correct</div>
+                <div className='stat-label'>{messages.CORRECT}</div>
               </div>
               <div className='stat-box'>
                 <div className='stat-value'>
                   {questions.length - correctAnswers}
                 </div>
-                <div className='stat-label'>Wrong</div>
+                <div className='stat-label'>{messages.WRONG}</div>
               </div>
               <div className='stat-box'>
                 <div className='stat-value'>{accuracy}%</div>
-                <div className='stat-label'>Accuracy</div>
+                <div className='stat-label'>{messages.ACCURACY}</div>
               </div>
             </div>
           </div>
 
           <div className='questions-review'>
-            <h3>Question Review</h3>
+            <h3>{messages.QUESTION_REVIEW}</h3>
             <div className='review-list'>
               {results.map((result, index) => (
                 <div
@@ -212,19 +215,19 @@ const Game = () => {
                     <div className='review-answers'>
                       {result.isCorrect ? (
                         <span className='review-correct'>
-                          You got it right! ✓
+                          {messages.CORRECT_ANSWER_FEEDBACK}
                         </span>
                       ) : result.selectedAnswer === 'timeout' ? (
                         <span className='review-wrong'>
-                          Time's up! The answer was: {result.correctAnswer}
+                          {messages.TIMEOUT_FEEDBACK} {result.correctAnswer}
                         </span>
                       ) : (
                         <span className='review-wrong'>
-                          You answered:{' '}
+                          {messages.YOU_ANSWERED}{' '}
                           <span className='selected'>
                             {result.selectedAnswer}
                           </span>
-                          &nbsp;&nbsp; &nbsp;&nbsp;Correct answer:{' '}
+                          &nbsp;&nbsp; &nbsp;&nbsp;{messages.CORRECT_ANSWER}{' '}
                           <span className='correct-text'>
                             {result.correctAnswer}
                           </span>
@@ -239,7 +242,7 @@ const Game = () => {
 
           <button className='play-again-btn' onClick={handlePlayAgain}>
             <span className='btn-icon'>🎮</span>
-            Play Again
+            {messages.PLAY_AGAIN}
           </button>
         </div>
       </div>
@@ -279,7 +282,7 @@ const Game = () => {
         </div>
 
         <div className='score-container'>
-          <div className='score-label'>SCORE</div>
+          <div className='score-label'>{messages.SCORE}</div>
           <div className='score-value'>{score}</div>
         </div>
       </div>
@@ -287,12 +290,14 @@ const Game = () => {
       {showStreak && streakCount >= 2 && (
         <div className='streak-notification'>
           <span className='streak-icon'>🔥</span>
-          <span className='streak-text'>{streakCount} in a row!</span>
+          <span className='streak-text'>
+            {messages.STREAK_MESSAGE.replace('{count}', streakCount)}
+          </span>
         </div>
       )}
 
       <div className='timer-wrapper'>
-        <div className='timer-label'>TIME LEFT</div>
+        <div className='timer-label'>{messages.TIME_LEFT}</div>
         <div className='timer-container'>
           <div
             className={`timer ${timeLeft <= 5 ? 'timer-warning' : ''}`}
@@ -352,22 +357,20 @@ const Game = () => {
             {questionResult === 'correct' ? (
               <>
                 <span className='feedback-icon'>🎉</span>
-                <span className='feedback-text'>Correct! +20 points</span>
+                <span className='feedback-text'>{messages.CORRECT_POINTS}</span>
               </>
             ) : selectedOption ? (
               <>
                 <span className='feedback-icon'>❌</span>
                 <span className='feedback-text'>
-                  Incorrect! The correct answer is:{' '}
-                  {currentQuestion.correctAnswer}
+                  {messages.INCORRECT_ANSWER} {currentQuestion.correctAnswer}
                 </span>
               </>
             ) : (
               <>
                 <span className='feedback-icon'>⏰</span>
                 <span className='feedback-text'>
-                  Time's up! The correct answer is:{' '}
-                  {currentQuestion.correctAnswer}
+                  {messages.TIMES_UP} {currentQuestion.correctAnswer}
                 </span>
               </>
             )}
@@ -379,3 +382,4 @@ const Game = () => {
 };
 
 export default Game;
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

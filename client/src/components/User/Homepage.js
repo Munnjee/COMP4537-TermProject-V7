@@ -5,10 +5,12 @@ import './Homepage.css';
 import { generateQuestions } from '../../services/apiService';
 import messages from '../../utils/messages';
 import { popularTopics } from '../../data/topics';
+
 const UserHomepage = ({ user, setUser }) => {
   const [flippedCards, setFlippedCards] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [customTopic, setCustomTopic] = useState('');
+  const [isLoading, setIsLoading] = useState(false); // Add loading state
   const navigate = useNavigate();
 
   // Add this to load the fonts
@@ -65,9 +67,12 @@ const UserHomepage = ({ user, setUser }) => {
   const handleCloseModal = () => {
     setShowModal(false);
     setCustomTopic('');
+    setIsLoading(false); // Reset loading state when closing modal
   };
 
   const handleSubmitTopic = async () => {
+    setIsLoading(true); // Set loading state to true when submitting
+
     try {
       // Generate questions from API
       const questions = await generateQuestions(customTopic, 5);
@@ -97,14 +102,17 @@ const UserHomepage = ({ user, setUser }) => {
         });
       } else {
         // Handle case when no questions are returned
+        setIsLoading(false); // Reset loading state before showing alert
         alert(messages.QUESTIONS_GENERATION_FAILED);
       }
     } catch (error) {
       console.error('Error generating questions:', error);
+      setIsLoading(false); // Reset loading state before showing alert
       alert(messages.QUESTIONS_GENERATION_ERROR);
     }
 
-    handleCloseModal();
+    // Note: Not calling handleCloseModal here since we navigate on success
+    // and reset loading on error
   };
 
   const handleRandomTopic = () => {
@@ -207,17 +215,26 @@ const UserHomepage = ({ user, setUser }) => {
               placeholder={messages.TOPIC_INPUT_PLACEHOLDER}
               value={customTopic}
               onChange={(e) => setCustomTopic(e.target.value)}
+              disabled={isLoading}
             />
 
             <div className='modal-buttons'>
-              <button onClick={handleRandomTopic}>
+              <button onClick={handleRandomTopic} disabled={isLoading}>
                 {messages.RANDOM_TOPIC}
               </button>
               <button
                 onClick={handleSubmitTopic}
-                disabled={!customTopic.trim()}
+                disabled={!customTopic.trim() || isLoading}
+                className={isLoading ? 'loading-button' : ''}
               >
-                {messages.START_GAME}
+                {isLoading ? (
+                  <div className='loading-spinner'>
+                    <div className='spinner'></div>
+                    <span>Loading...</span>
+                  </div>
+                ) : (
+                  messages.START_GAME
+                )}
               </button>
             </div>
           </div>

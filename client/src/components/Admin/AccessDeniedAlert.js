@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import messages from '../../utils/messages'
 
 const AccessDeniedAlert = ({ onClose, redirectTimeout = 3 }) => {
   const [countdown, setCountdown] = useState(redirectTimeout);
@@ -21,11 +22,11 @@ const AccessDeniedAlert = ({ onClose, redirectTimeout = 3 }) => {
   return (
     <div className="modal-overlay">
       <div className="modal-content" style={{ maxWidth: '400px' }}>
-        <h2 style={{ color: '#ef4444' }}>Access Denied</h2>
-        <p>You do not have administrator privileges to view this page.</p>
-        <p>You will be redirected to the homepage in {countdown} seconds.</p>
+        <h2 style={{ color: '#ef4444' }}>{messages.ACCESS_DENIED}</h2>
+        <p>{messages.ADMIN_ONLY}</p>
+        <p>{messages.RETURN_HOME} in {countdown} seconds.</p>
         <div className="modal-buttons">
-          <button onClick={onClose}>Go to Homepage Now</button>
+          <button onClick={onClose}>{messages.RETURN_HOME}</button>
         </div>
       </div>
     </div>

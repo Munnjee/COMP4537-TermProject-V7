@@ -18,6 +18,8 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import Game from './components/User/Game';
 import NotFound from './components/Common/NotFound';
 import RouteChecker from './components/Common/RouteChecker';
+import messages from './utils/messages';
+
 
 // CSS
 import './App.css';
@@ -43,7 +45,7 @@ const App = () => {
   }, []);
 
   if (loading) {
-    return <div className='loading-app'>Loading...</div>;
+    return <div className='loading-app'>{messages.LOADING}</div>;
   }
 
   return (

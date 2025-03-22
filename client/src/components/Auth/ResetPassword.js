@@ -26,7 +26,7 @@ const ResetPassword = () => {
         const response = await api.get(`/auth/verify-reset-token/${token}`);
         setTokenValid(true);
       } catch (err) {
-        setError('This password reset link is invalid or has expired.');
+        setError(messages.INVALID_RESET_TOKEN);
         setTokenValid(false);
       } finally {
         setVerifying(false);
@@ -45,12 +45,12 @@ const ResetPassword = () => {
     
     // Validate passwords
     if (password.length < 3) {
-      setError('Password must be at least 3 characters long');
+      setError(messages.PASSWORD_LENGTH);
       return;
     }
     
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(messages.PASSWORDS_DO_NOT_MATCH);
       return;
     }
     
@@ -77,7 +77,7 @@ const ResetPassword = () => {
     return (
       <div className="login-container">
         <h1>Reset Password</h1>
-        <div className="loading-message">Verifying reset link...</div>
+        <div className="loading-message">{messages.VERIFYING_RESET_TOKEN}</div>
       </div>
     );
   }
@@ -86,10 +86,10 @@ const ResetPassword = () => {
   if (!tokenValid) {
     return (
       <div className="login-container">
-        <h1>Reset Password</h1>
+        <h1>{messages.RESET_PASSWORD}</h1>
         <div className="alert alert-danger">{error}</div>
         <p>
-          <Link to="/forgot-password">Request a new password reset link</Link>
+          <Link to="/forgot-password">{messages.REQUEST_RESET_LINK}</Link>
         </p>
       </div>
     );
@@ -97,12 +97,12 @@ const ResetPassword = () => {
 
   return (
     <div className="login-container">
-      <h1>Reset Password</h1>
+      <h1>{messages.RESET_PASSWORD}</h1>
       
       {success ? (
         <div className="success-message">
-          <p>Password has been reset successfully!</p>
-          <p>Redirecting to login page...</p>
+          <p>{messages.PASSWORD_RESET_SUCCESS}</p>
+          <p>{messages.RETURN_LOGIN}...</p>
         </div>
       ) : (
         <>
@@ -110,38 +110,38 @@ const ResetPassword = () => {
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="password">New Password</label>
+              <label htmlFor="password">{messages.NEW_PASSWORD}</label>
               <input
                 type="password"
                 id="password"
                 name="password"
                 value={password}
                 onChange={onChange}
-                placeholder="Enter your new password"
+                placeholder={messages.NEW_PASSWORD_INFO}
                 required
               />
             </div>
             
             <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm New Password</label>
+              <label htmlFor="confirmPassword">{messages.CONFIRM_PASSWORD}</label>
               <input
                 type="password"
                 id="confirmPassword"
                 name="confirmPassword"
                 value={confirmPassword}
                 onChange={onChange}
-                placeholder="Confirm your new password"
+                placeholder={messages.CONFIRM_PASSWORD_PLACEHOLDER}
                 required
               />
             </div>
             
-            <button type="submit" disabled={loading}>
-              {loading ? 'Resetting...' : 'Reset Password'}
+            <button className="home-button" type="submit" disabled={loading}>
+              {loading ? messages.RESETTING_PASSWORD : messages.RESET_PASSWORD}
             </button>
           </form>
           
           <p>
-            <Link to="/login">Back to Login</Link>
+            <Link to="/login">{messages.RETURN_LOGIN}</Link>
           </p>
         </>
       )}

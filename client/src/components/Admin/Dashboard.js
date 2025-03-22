@@ -4,6 +4,7 @@ import { logout } from '../../services/authService';
 import { getApiStats, getUserStats, verifyAdminAccess } from '../../services/adminService';
 import UserManagement from './UserManagement';
 import AccessDeniedAlert from './AccessDeniedAlert';
+import './Dashboard.css';
 import messages from '../../utils/messages';
 
 const AdminDashboard = ({ user, setUser }) => {
@@ -72,31 +73,31 @@ const AdminDashboard = ({ user, setUser }) => {
   }
 
   if (loading) {
-    return <div className="loading">Loading statistics...</div>;
+    return <div className="loading">{messages.LOADING}</div>;
   }
 
   return (
     <div className="admin-dashboard">
-      <h1>Admin Dashboard</h1>
+      <h1>{messages.ADMIN_DASHBOARD}</h1>
 
       <div className="admin-tabs">
         <button
           className={`tab-button ${activeTab === 'endpoints' ? 'active' : ''}`}
           onClick={() => setActiveTab('endpoints')}
         >
-          API Endpoints Stats
+          {messages.ENDPOINTS_STATS}
         </button>
         <button
           className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
           onClick={() => setActiveTab('users')}
         >
-          User API Usage
+          {messages.USER_API_USAGE}
         </button>
         <button
           className={`tab-button ${activeTab === 'management' ? 'active' : ''}`}
           onClick={() => setActiveTab('management')}
         >
-          User Management
+          {messages.USER_MANAGEMENT}
         </button>
       </div>
 
@@ -105,13 +106,13 @@ const AdminDashboard = ({ user, setUser }) => {
       <div className="stats-container">
         {activeTab === 'endpoints' && (
           <div className="endpoints-stats">
-            <h2>API Endpoints Usage</h2>
+            <h2>{messages.ENDPOINTS_STATS}</h2>
             <table className="stats-table">
               <thead>
                 <tr>
-                  <th>Method</th>
-                  <th>Endpoint</th>
-                  <th>Requests</th>
+                  <th>{messages.METHOD}</th>
+                  <th>{messages.ENDPOINT}</th>
+                  <th>{messages.REQUESTS}</th>
                 </tr>
               </thead>
               <tbody>
@@ -125,7 +126,7 @@ const AdminDashboard = ({ user, setUser }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="no-data">No endpoint data available</td>
+                    <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
                   </tr>
                 )}
               </tbody>
@@ -135,13 +136,13 @@ const AdminDashboard = ({ user, setUser }) => {
 
         {activeTab === 'users' && (
           <div className="users-stats">
-            <h2>User API Usage</h2>
+            <h2>{messages.USER_API_USAGE}</h2>
             <table className="stats-table">
               <thead>
                 <tr>
-                  <th>User Name</th>
-                  <th>Email</th>
-                  <th>Total Requests</th>
+                  <th>{messages.USER_NAME}</th>
+                  <th>{messages.EMAIL}</th>
+                  <th>{messages.TOTAL_REQUESTS}</th>
                 </tr>
               </thead>
               <tbody>
@@ -155,7 +156,7 @@ const AdminDashboard = ({ user, setUser }) => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="no-data">No user data available</td>
+                    <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
                   </tr>
                 )}
               </tbody>

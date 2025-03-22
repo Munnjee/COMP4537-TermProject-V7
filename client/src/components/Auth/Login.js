@@ -53,38 +53,38 @@ const Login = ({ setUser }) => {
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={onSubmit}>
         <div className="form-group">
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">{messages.EMAIL}</label>
           <input
             type="email"
             name="email"
             id="email"
             value={email}
             onChange={onChange}
-            placeholder="Enter your email"
+            placeholder={messages.EMAIL_PLACEHOLDER}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{messages.PASSWORD}</label>
           <input
             type="password"
             name="password"
             id="password"
             value={password}
             onChange={onChange}
-            placeholder="Enter your password"
+            placeholder= {messages.PASSWORD_PLACEHOLDER}
             required
           />
           <div className="forgot-password-link">
-            <Link to="/forgot-password">Forgot password?</Link>
+            <Link to="/forgot-password">{messages.FORGOT_PASSWORD}?</Link>
           </div>
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+        <button className="home-button" type="submit" disabled={loading}>
+          {loading ? messages.LOGGING_IN : messages.LOGIN}
         </button>
       </form>
       <p>
-        Don't have an account? <Link to="/register">Register</Link>
+        {messages.REGISTER_INFO} <Link to="/register">{messages.REGISTER}</Link>
       </p>
     </div>
   );

@@ -45,7 +45,7 @@ const Register = ({ setUser }) => {
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(messages.PASSWORDS_DO_NOT_MATCH);
       return;
     }
 
@@ -65,63 +65,63 @@ const Register = ({ setUser }) => {
 
   return (
     <div className="register-container">
-      <h1>Register</h1>
+      <h1>{messages.REGISTER}</h1>
       {error && <div className="alert alert-danger">{error}</div>}
       <form onSubmit={onSubmit}>
         <div className="form-group">
-          <label htmlFor="firstName">First Name</label>
+          <label htmlFor="firstName">{messages.USER_NAME}</label>
           <input
             type="text"
             name="firstName"
             id="firstName"
             value={firstName}
             onChange={onChange}
-            placeholder="Enter your first name"
+            placeholder= {messages.USER_NAME_PLACEHOLDER}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="email">Email Address</label>
+          <label htmlFor="email">{messages.EMAIL}</label>
           <input
             type="email"
             name="email"
             id="email"
             value={email}
             onChange={onChange}
-            placeholder="Enter your email"
+            placeholder={messages.EMAIL_PLACEHOLDER}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">{messages.PASSWORD}</label>
           <input
             type="password"
             name="password"
             id="password"
             value={password}
             onChange={onChange}
-            placeholder="Enter your password"
+            placeholder={messages.PASSWORD_PLACEHOLDER}
             required
           />
         </div>
         <div className="form-group">
-          <label htmlFor="confirmPassword">Confirm Password</label>
+          <label htmlFor="confirmPassword">{messages.CONFIRM_PASSWORD}</label>
           <input
             type="password"
             name="confirmPassword"
             id="confirmPassword"
             value={confirmPassword}
             onChange={onChange}
-            placeholder="Confirm your password"
+            placeholder={messages.CONFIRM_PASSWORD_PLACEHOLDER}
             required
           />
         </div>
-        <button type="submit" disabled={loading}>
-          {loading ? "Registering..." : "Register"}
+        <button className="home-button" type="submit" disabled={loading}>
+          {loading ? messages.REGISTERING : messages.REGISTER}
         </button>
       </form>
       <p>
-        Already have an account? <Link to="/login">Login</Link>
+        {messages.ALREADY_REGISTERED} <Link to="/login">{messages.LOGIN}</Link>
       </p>
     </div>
   );

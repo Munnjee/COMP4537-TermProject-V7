@@ -1,16 +1,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './NotFound.css';
+import messages from '../../utils/messages';
 
 const NotFound = () => {
   return (
     <div className="not-found-container">
       <div className="not-found-content">
         <h1>404</h1>
-        <h2>Page Not Found</h2>
-        <p>The page you are looking for doesn't exist or has been moved.</p>
+        <h2>{messages.PAGE_NOT_FOUND_TITLE}</h2>
+        <p>{messages.PAGE_NOT_FOUND}</p>
         <Link to="/" className="home-button">
-          Go to Homepage
+          {messages.RETURN_HOME}
         </Link>
       </div>
     </div>

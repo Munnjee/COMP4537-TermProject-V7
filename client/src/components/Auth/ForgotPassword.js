@@ -19,12 +19,12 @@ const ForgotPassword = () => {
     
     // Validate email
     if (!email) {
-      setError('Please enter your email address');
+      setError(messages.EMAIL_REQUIRED);
       return;
     }
 
     if (!validateEmail(email)) {
-      setError('Please enter a valid email address');
+      setError(messages.INVALID_EMAIL);
       return;
     }
     
@@ -47,9 +47,9 @@ const ForgotPassword = () => {
       
       {success ? (
         <div className="success-message">
-          <p>Password reset email sent! Check your inbox for instructions.</p>
+          <p>{messages.PASSWORD_RESET_EMAIL_SENT}</p>
           <p>
-            <Link to="/login">Back to Login</Link>
+            <Link to="/login">{messages.RETURN_LOGIN}</Link>
           </p>
         </div>
       ) : (
@@ -57,31 +57,31 @@ const ForgotPassword = () => {
           {error && <div className="alert alert-danger">{error}</div>}
           
           <p className="info-text">
-            Enter your email address and we'll send you a link to reset your password.
+            {messages.RESET_PASSWORD_INFO}
           </p>
           
           <form onSubmit={handleSubmit}>
             <div className="form-group">
-              <label htmlFor="email">Email Address</label>
+              <label htmlFor="email">{messages.EMAIL}</label>
               <input
                 type="email"
                 id="email"
                 name="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder={messages.EMAIL_PLACEHOLDER}
                 disabled={loading}
                 required
               />
             </div>
             
-            <button type="submit" disabled={loading}>
-              {loading ? 'Sending...' : 'Send Reset Link'}
+            <button className="home-button" type="submit" disabled={loading}>
+              {loading ? messages.SENDING : messages.SEND_RESET_LINK}
             </button>
           </form>
           
           <p>
-            <Link to="/login">Back to Login</Link>
+            <Link to="/login">{messages.RETURN_LOGIN}</Link>
           </p>
         </>
       )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getUsers, updateUserRole } from '../../services/adminService';
+import messages from '../../utils/messages';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -25,62 +26,45 @@ const UserManagement = () => {
   };
 
   const handleRoleChange = async (userId, currentRole) => {
-    // If the current role is 'user', change to 'admin', otherwise change to 'user'
     const newRole = currentRole === 'user' ? 'admin' : 'user';
-    
+
     try {
-      // Optimistic UI update
-      setUsers(users.map(user => 
+      const response = await updateUserRole(userId, newRole);
+      setUsers(users.map(user =>
         user._id === userId ? { ...user, role: newRole } : user
       ));
-      
-      setSuccessMessage(`Updating user role to ${newRole}...`);
-      
-      // Call API to update role
-      const response = await updateUserRole(userId, newRole);
-      
-      // Show success message
-      setSuccessMessage(`User role updated to ${newRole} successfully!`);
-      
-      // Clear success message after 3 seconds
+      setSuccessMessage(`${messages.ROLE_UPDATED} to ${newRole} successfully!`);
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);
-      
+
     } catch (err) {
-      // Revert optimistic update
-      setUsers(users.map(user => 
-        user._id === userId ? { ...user, role: currentRole } : user
-      ));
-      
-      setError(err.message || 'Error updating user role');
-      
-      // Clear error message after 3 seconds
+      setError(err.message || messages.ERROR_UPDATING_ROLE);
       setTimeout(() => {
         setError('');
       }, 3000);
     }
-  };
+};
 
   if (loading) {
-    return <div className="loading">Loading users...</div>;
+    return <div className="loading">{messages.LOADING}</div>;
   }
 
   return (
     <div className="user-management">
-      <h2>User Management</h2>
-      
+      <h2>{messages.USER_MANAGEMENT}</h2>
+
       {error && <div className="error-message">{error}</div>}
       {successMessage && <div className="success-message">{successMessage}</div>}
-      
+
       <table className="stats-table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>API Calls</th>
-            <th>Actions</th>
+            <th>{messages.USER_NAME}</th>
+            <th>{messages.EMAIL}</th>
+            <th>{messages.ROLE}</th>
+            <th>{messages.API_CALLS}</th>
+            <th>{messages.ACTION}</th>
           </tr>
         </thead>
         <tbody>
@@ -96,18 +80,18 @@ const UserManagement = () => {
                 </td>
                 <td>{user.apiCallsCount}</td>
                 <td>
-                  <button 
+                  <button
                     className={`role-button ${user.role === 'user' ? 'promote' : 'demote'}`}
                     onClick={() => handleRoleChange(user._id, user.role)}
                   >
-                    {user.role === 'user' ? 'Make Admin' : 'Make User'}
+                    {user.role === 'user' ? messages.MAKE_ADMIN : messages.MAKE_USER}
                   </button>
                 </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5" className="no-data">No users found</td>
+              <td colSpan="5" className="no-data">{messages.NO_DATA}</td>
             </tr>
           )}
         </tbody>

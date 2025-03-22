@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Navigate } from 'react-router-dom';
 import { checkRouteExists } from '../../services/routeService';
 import NotFound from './NotFound';
+import messages from '../../utils/messages';
 
 const RouteChecker = ({ user }) => {
   const [routeExists, setRouteExists] = useState(null);
@@ -43,7 +44,7 @@ const RouteChecker = ({ user }) => {
 
   // Show loading while checking
   if (isChecking) {
-    return <div className="loading">Checking route...</div>;
+    return <div className="loading">{messages.LOADING}</div>;
   }
 
   // If route doesn't exist, show 404 page

@@ -26,7 +26,6 @@ exports.register = async (req, res, next) => {
       });
     }
 
-    // Create user (Admin user can be set manually in the database)
     const user = await User.create({
       firstName,
       email,

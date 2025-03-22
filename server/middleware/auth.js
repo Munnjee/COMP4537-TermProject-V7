@@ -90,7 +90,7 @@ exports.trackApiUsage = async (req, res, next) => {
       // Update user object in request
       req.user = await User.findById(req.user._id);
 
-      // Check if user has reached API limit (only affects non-admin users)
+      // Check if user has reached API limit 
       if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
         // We continue providing service but with a warning
         req.apiLimitReached = true;

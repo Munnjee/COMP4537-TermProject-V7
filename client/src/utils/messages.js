@@ -54,7 +54,7 @@ const messages = {
   WRONG: 'Wrong',
   ACCURACY: 'Accuracy',
   QUESTION_REVIEW: 'Question Review',
-  PLAY_AGAIN: 'Play Again',
+  BACK_TO_HOME: 'Back to Home',
   CORRECT_ANSWER_FEEDBACK: 'You got it right! ✓',
   TIMEOUT_FEEDBACK: "Time's up! The answer was:",
   YOU_ANSWERED: 'You answered:',

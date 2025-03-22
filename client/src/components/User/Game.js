@@ -75,15 +75,18 @@ const Game = () => {
   };
 
   const updateResults = (option) => {
-    setResults((prev) => [
-      ...prev,
-      {
-        question: questions[currentQuestionIndex].question,
-        selectedAnswer: option,
-        correctAnswer: questions[currentQuestionIndex].correctAnswer,
-        isCorrect: option === questions[currentQuestionIndex].correctAnswer,
-      },
-    ]);
+    if (!questionProcessedRef.current) {
+      questionProcessedRef.current = true;
+      setResults((prev) => [
+        ...prev,
+        {
+          question: questions[currentQuestionIndex].question,
+          selectedAnswer: option,
+          correctAnswer: questions[currentQuestionIndex].correctAnswer,
+          isCorrect: option === questions[currentQuestionIndex].correctAnswer,
+        },
+      ]);
+    }
   };
 
   const handleOptionSelect = (option) => {
@@ -132,6 +135,8 @@ const Game = () => {
     }, 2000);
   };
 
+  const questionProcessedRef = useRef(false);
+
   const moveToNextQuestion = () => {
     if (currentQuestionIndex === questions.length - 1) {
       // End of quiz
@@ -149,6 +154,7 @@ const Game = () => {
         setQuestionResult(null);
         setCurrentQuestionIndex((prev) => prev + 1);
         setIsExiting(false);
+        questionProcessedRef.current = false;
       }, 500);
     }
   };
@@ -241,8 +247,8 @@ const Game = () => {
           </div>
 
           <button className='play-again-btn' onClick={handlePlayAgain}>
-            <span className='btn-icon'>🎮</span>
-            {messages.PLAY_AGAIN}
+            <span className='btn-icon'>🏠</span>
+            {messages.BACK_TO_HOME}
           </button>
         </div>
       </div>

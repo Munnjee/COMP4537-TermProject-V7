@@ -58,7 +58,33 @@ app.use('/api/v1/trivia', apiRoutes);
 app.use('/api/v1/scores', scoreRoutes);
 
 // 404 handler
-app.use((req, res, next) => {
+app.use((req, res) => {
+  // Special handling for admin routes to ensure proper status codes
+  if (req.originalUrl.startsWith('/api/v1/admin')) {
+    // If it's an admin route, first check authentication
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: `Authentication required for: ${req.originalUrl}`,
+      });
+    }
+    
+    // If authenticated but not admin, return 403
+    if (req.user && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: `Admin access required for: ${req.originalUrl}`,
+      });
+    }
+    
+    // If admin but route not found, return 404
+    return res.status(404).json({
+      success: false,
+      message: `Admin route not found: ${req.originalUrl}`,
+    });
+  }
+  
+  // Generic 404 for other routes
   res.status(404).json({
     success: false,
     message: `Route not found: ${req.originalUrl}`,
@@ -66,3 +92,5 @@ app.use((req, res, next) => {
 });
 
 module.exports = app;
+
+// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

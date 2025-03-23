@@ -63,7 +63,7 @@ exports.authorize = (...roles) => {
   };
 };
 
-// Track API usage
+// Track API usage - ONLY for successful requests
 exports.trackApiUsage = async (req, res, next) => {
   // Skip tracking for auth routes and documentation
   if (
@@ -74,33 +74,33 @@ exports.trackApiUsage = async (req, res, next) => {
   }
   
   try {
-    if (req.user) {
-      // Record API usage for analytics purposes
-      await ApiUsage.create({
-        endpoint: req.originalUrl,
-        method: req.method,
-        user: req.user._id,
-      });
+    const originalSend = res.send;
+    
+    res.send = function (body) {
+      // Only track if the request was successful (2xx status code)
+      if (res.statusCode >= 200 && res.statusCode < 300 && req.user) {
+        // Record API usage for analytics purposes
+        ApiUsage.create({
+          endpoint: req.originalUrl,
+          method: req.method,
+          user: req.user._id,
+        }).catch(err => console.error('Error logging API usage:', err));
 
-      // Only increment counter for trivia generation
-      if (req.originalUrl.includes('/api/v1/trivia/generate')) {
-        await User.findByIdAndUpdate(req.user._id, {
-          $inc: { apiCallsCount: 1 },
-        });
-
-        // Update user object in request
-        req.user = await User.findById(req.user._id);
-
-        // Check if user has reached API limit 
-        if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
-          // We continue providing service but with a warning
-          req.apiLimitReached = true;
+        // Only increment counter for trivia generation
+        if (req.originalUrl.includes('/api/v1/trivia/generate')) {
+          User.findByIdAndUpdate(req.user._id, {
+            $inc: { apiCallsCount: 1 },
+          }).catch(err => console.error('Error updating API calls count:', err));
         }
       }
-    }
+      
+      // Continue with the original response
+      originalSend.call(this, body);
+    };
+    
     next();
   } catch (error) {
-    console.error('Error tracking API usage:', error);
+    console.error('Error in trackApiUsage middleware:', error);
     next();
   }
 };

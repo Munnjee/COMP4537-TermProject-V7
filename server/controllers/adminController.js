@@ -133,20 +133,19 @@ exports.deleteUsers = async (req, res, next) => {
     const Leaderboard = require('../models/Leaderboard');
     await Leaderboard.deleteMany({ user: { $in: userIds } });
     
+    // Delete API usage data 
+    const ApiUsage = require('../models/ApiUsage');
+    await ApiUsage.deleteMany({ user: { $in: userIds } });
+
     // Delete users
     const result = await User.deleteMany({
       _id: { $in: userIds }
     });
     
-    // Also delete associated API usage data
-    await ApiUsage.deleteMany({
-      user: { $in: userIds }
-    });
-    
     res.status(200).json({
       success: true,
       count: result.deletedCount,
-      message: `Successfully deleted ${result.deletedCount} user(s)`,
+      message: `Successfully deleted ${result.deletedCount} user(s) and their associated data`,
     });
   } catch (error) {
     console.error('Delete users error:', error);

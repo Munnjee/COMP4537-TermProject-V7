@@ -106,6 +106,12 @@ const App = () => {
             }
           />
 
+          {/* Catch Admin Routes explicitly */}
+          <Route
+            path='/admin/*'
+            element={<RouteChecker user={user} />}
+          />
+
           {/* 404 Route - Explicit Not Found Page */}
           <Route path='/404' element={<NotFound />} />
 

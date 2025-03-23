@@ -29,4 +29,12 @@ router.get('/users', getUsers);
 router.put('/users/:id/role', updateUserRole);
 router.delete('/users', deleteUsers);
 
+// Catch-all route for admin routes that don't exist
+router.all('*', (req, res) => {
+  res.status(404).json({
+    success: false,
+    message: `Admin route not found: ${req.originalUrl}`
+  });
+});
+
 module.exports = router;

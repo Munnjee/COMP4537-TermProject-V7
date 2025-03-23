@@ -65,10 +65,9 @@ exports.authorize = (...roles) => {
 
 // Track API usage
 exports.trackApiUsage = async (req, res, next) => {
-  // Skip tracking for auth routes and admin GET requests
+  // Skip tracking for auth routes
   if (
-    req.originalUrl.startsWith('/api/v1/auth/') || 
-    (req.originalUrl.startsWith('/api/v1/admin/') && req.method === 'GET')
+    req.originalUrl.startsWith('/api/v1/auth/') 
   ) {
     return next();
   }

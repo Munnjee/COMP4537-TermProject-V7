@@ -48,10 +48,17 @@ const UserManagement = ({ onUserUpdated }) => {
 
     try {
       await updateUserRole(userId, newRole);
+      
+      // Update local state immediately for better UX
       setUsers(users.map(user =>
         user._id === userId ? { ...user, role: newRole } : user
       ));
+      
+      // Show success message
       setSuccessMessage(`${messages.ROLE_UPDATED} ${newRole} successfully!`);
+
+      // Fetch fresh data to ensure consistency
+      await fetchUsers();
 
       // Call the callback to update dashboard stats
       if (onUserUpdated) {
@@ -89,9 +96,15 @@ const UserManagement = ({ onUserUpdated }) => {
 
     try {
       await deleteUsers(selectedUsers);
-      // Remove deleted users from state
+      
+      // Update local state immediately
       setUsers(users.filter(user => !selectedUsers.includes(user._id)));
+      
+      // Show success message
       setSuccessMessage(`Successfully deleted ${selectedUsers.length} user(s)`);
+
+      // Fetch fresh data
+      await fetchUsers();
 
       // Call the callback to update dashboard stats
       if (onUserUpdated) {
@@ -100,6 +113,7 @@ const UserManagement = ({ onUserUpdated }) => {
 
       // Reset selections
       setSelectedUsers([]);
+      
       setTimeout(() => {
         setSuccessMessage('');
       }, 3000);

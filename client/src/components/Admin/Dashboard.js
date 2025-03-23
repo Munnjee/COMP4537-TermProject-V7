@@ -17,32 +17,44 @@ const AdminDashboard = ({ user, setUser }) => {
   const [showAccessDenied, setShowAccessDenied] = useState(false);
   const navigate = useNavigate();
 
-  // Function to fetch stats from the API
-  const fetchStats = async () => {
+  // Function to fetch endpoint stats
+  const fetchEndpointStats = async () => {
     try {
       setLoading(true);
-      const [endpointRes, userRes] = await Promise.all([
-        getApiStats(),
-        getUserStats()
-      ]);
-
+      const endpointRes = await getApiStats();
       setEndpointStats(endpointRes.data);
-      setUserStats(userRes.data);
       setError('');
     } catch (err) {
-      console.error('Error fetching stats:', err);
+      console.error('Error fetching endpoint stats:', err);
       setError(messages.SERVER_ERROR);
     } finally {
       setLoading(false);
     }
   };
 
+  // Function to fetch user stats
+  const fetchUserStats = async () => {
+    try {
+      setLoading(true);
+      const userRes = await getUserStats();
+      setUserStats(userRes.data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching user stats:', err);
+      setError(messages.SERVER_ERROR);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Initial setup and admin access verification
   useEffect(() => {
     const checkAdminAccess = async () => {
       try {
         await verifyAdminAccess();
         setAdminAccessVerified(true);
-        fetchStats();
+        // Load initial data for the first tab
+        fetchEndpointStats();
       } catch (err) {
         console.error('Admin access verification failed:', err);
         if (err.response && err.response.status === 403) {
@@ -53,7 +65,19 @@ const AdminDashboard = ({ user, setUser }) => {
     };
 
     checkAdminAccess();
-  }, [navigate]);
+  }, []);
+
+  // Fetch data when tab changes
+  useEffect(() => {
+    if (!adminAccessVerified) return;
+    
+    if (activeTab === 'endpoints') {
+      fetchEndpointStats();
+    } else if (activeTab === 'users') {
+      fetchUserStats();
+    }
+    // No fetch needed for 'management' tab as it handles its own data
+  }, [activeTab, adminAccessVerified]);
 
   const handleLogout = async () => {
     try {
@@ -69,11 +93,15 @@ const AdminDashboard = ({ user, setUser }) => {
     navigate('/');
   };
 
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+  };
+
   if (showAccessDenied) {
     return <AccessDeniedAlert onClose={handleRedirectToHome} redirectTimeout={5} />;
   }
 
-  if (loading) {
+  if (loading && !activeTab) {
     return <div className="loading">{messages.LOADING}</div>;
   }
 
@@ -84,19 +112,19 @@ const AdminDashboard = ({ user, setUser }) => {
       <div className="admin-tabs">
         <button
           className={`tab-button ${activeTab === 'endpoints' ? 'active' : ''}`}
-          onClick={() => setActiveTab('endpoints')}
+          onClick={() => handleTabChange('endpoints')}
         >
           {messages.ENDPOINTS_STATS}
         </button>
         <button
           className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
-          onClick={() => setActiveTab('users')}
+          onClick={() => handleTabChange('users')}
         >
           {messages.USER_API_USAGE}
         </button>
         <button
           className={`tab-button ${activeTab === 'management' ? 'active' : ''}`}
-          onClick={() => setActiveTab('management')}
+          onClick={() => handleTabChange('management')}
         >
           {messages.USER_MANAGEMENT}
         </button>
@@ -108,65 +136,76 @@ const AdminDashboard = ({ user, setUser }) => {
         {activeTab === 'endpoints' && (
           <div className="endpoints-stats">
             <h2>{messages.ENDPOINTS_STATS}</h2>
-            <table className="stats-table">
-              <thead>
-                <tr>
-                  <th>{messages.METHOD}</th>
-                  <th>{messages.ENDPOINT}</th>
-                  <th>{messages.REQUESTS}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {endpointStats.length > 0 ? (
-                  endpointStats.map((stat, index) => (
-                    <tr key={index}>
-                      <td>{stat.method}</td>
-                      <td>{stat.endpoint}</td>
-                      <td>{stat.requestCount}</td>
-                    </tr>
-                  ))
-                ) : (
+            {loading ? (
+              <div className="loading-message">{messages.LOADING}</div>
+            ) : (
+              <table className="stats-table">
+                <thead>
                   <tr>
-                    <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
+                    <th>{messages.METHOD}</th>
+                    <th>{messages.ENDPOINT}</th>
+                    <th>{messages.REQUESTS}</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {endpointStats.length > 0 ? (
+                    endpointStats.map((stat, index) => (
+                      <tr key={index}>
+                        <td>{stat.method}</td>
+                        <td>{stat.endpoint}</td>
+                        <td>{stat.requestCount}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
 
         {activeTab === 'users' && (
           <div className="users-stats">
             <h2>{messages.USER_API_USAGE}</h2>
-            <table className="stats-table">
-              <thead>
-                <tr>
-                  <th>{messages.USER_NAME}</th>
-                  <th>{messages.EMAIL}</th>
-                  <th>{messages.TOTAL_REQUESTS}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {userStats.length > 0 ? (
-                  userStats.map((user, index) => (
-                    <tr key={index}>
-                      <td>{user.firstName}</td>
-                      <td>{user.email}</td>
-                      <td>{user.totalRequests}</td>
-                    </tr>
-                  ))
-                ) : (
+            {loading ? (
+              <div className="loading-message">{messages.LOADING}</div>
+            ) : (
+              <table className="stats-table">
+                <thead>
                   <tr>
-                    <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
+                    <th>{messages.USER_NAME}</th>
+                    <th>{messages.EMAIL}</th>
+                    <th>{messages.TOTAL_REQUESTS}</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {userStats.length > 0 ? (
+                    userStats.map((user, index) => (
+                      <tr key={index}>
+                        <td>{user.firstName}</td>
+                        <td>{user.email}</td>
+                        <td>{user.totalRequests}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="no-data">{messages.NO_DATA}</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            )}
           </div>
         )}
 
         {activeTab === 'management' && (
-          <UserManagement onUserUpdated={fetchStats} />
+          <UserManagement onUserUpdated={() => {
+            // Refresh user stats when user management actions occur
+            fetchUserStats();
+          }} />
         )}
       </div>
 

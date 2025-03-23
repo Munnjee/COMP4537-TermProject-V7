@@ -1,10 +1,13 @@
 const express = require('express');
 const { saveScore, getLeaderboard } = require('../controllers/scoreController');
-const { protect } = require('../middleware/auth');
+const { protect, trackApiUsage } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/', protect, saveScore);
-router.get('/leaderboard', protect, getLeaderboard);
+router.use(protect);
+router.use(trackApiUsage);
+
+router.post('/', saveScore);
+router.get('/leaderboard', getLeaderboard);
 
 module.exports = router;

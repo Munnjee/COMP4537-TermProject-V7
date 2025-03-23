@@ -13,7 +13,6 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const scoreRoutes = require('./routes/scoreRoutes');
-const { trackApiUsage } = require('./middleware/auth');
 
 const app = express();
 
@@ -67,5 +66,3 @@ app.use((req, res, next) => {
 });
 
 module.exports = app;
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

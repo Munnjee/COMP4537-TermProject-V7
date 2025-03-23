@@ -65,9 +65,10 @@ exports.authorize = (...roles) => {
 
 // Track API usage
 exports.trackApiUsage = async (req, res, next) => {
-  // Skip tracking for auth routes
+  // Skip tracking for auth routes and documentation
   if (
-    req.originalUrl.startsWith('/api/v1/auth/') 
+    req.originalUrl.startsWith('/api/v1/auth/') ||
+    req.originalUrl.startsWith('/api/v1/docs')
   ) {
     return next();
   }
@@ -81,18 +82,20 @@ exports.trackApiUsage = async (req, res, next) => {
         user: req.user._id,
       });
 
-      // Increment apiCallsCount for all users including admins
-      await User.findByIdAndUpdate(req.user._id, {
-        $inc: { apiCallsCount: 1 },
-      });
+      // Only increment counter for trivia generation
+      if (req.originalUrl.includes('/api/v1/trivia/generate')) {
+        await User.findByIdAndUpdate(req.user._id, {
+          $inc: { apiCallsCount: 1 },
+        });
 
-      // Update user object in request
-      req.user = await User.findById(req.user._id);
+        // Update user object in request
+        req.user = await User.findById(req.user._id);
 
-      // Check if user has reached API limit 
-      if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
-        // We continue providing service but with a warning
-        req.apiLimitReached = true;
+        // Check if user has reached API limit 
+        if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
+          // We continue providing service but with a warning
+          req.apiLimitReached = true;
+        }
       }
     }
     next();
@@ -101,5 +104,3 @@ exports.trackApiUsage = async (req, res, next) => {
     next();
   }
 };
-
-// Attribution: ChatGPT was used for structure and organization of the code and Copilot was used to assist in writing the code.

@@ -128,6 +128,10 @@ exports.deleteUsers = async (req, res, next) => {
         message: 'You cannot delete your own account',
       });
     }
+
+    // Handle Leaderboard entries deletion first
+    const Leaderboard = require('../models/Leaderboard');
+    await Leaderboard.deleteMany({ user: { $in: userIds } });
     
     // Delete users
     const result = await User.deleteMany({

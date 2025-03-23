@@ -61,9 +61,37 @@ exports.saveScore = async (req, res) => {
 // @access  Private
 exports.getLeaderboard = async (req, res) => {
     try {
-        const leaderboard = await Leaderboard.find()
-            .sort({ averageAccuracy: -1})
-            .limit(10);
+        // Use aggregation pipeline to join with User collection and filter out deleted users
+        const leaderboard = await Leaderboard.aggregate([
+            {
+                $lookup: {
+                    from: 'users', 
+                    localField: 'user',
+                    foreignField: '_id',
+                    as: 'userInfo'
+                }
+            },
+            {
+                $match: {
+                    userInfo: { $ne: [] }  // Only include entries where user exists
+                }
+            },
+            {
+                $project: {
+                    user: 1,
+                    firstName: 1,
+                    averageAccuracy: 1,
+                    gamesPlayed: 1,
+                    lastUpdated: 1
+                }
+            },
+            {
+                $sort: { averageAccuracy: -1 }
+            },
+            {
+                $limit: 10
+            }
+        ]);
 
         res.status(200).json({
             success: true,

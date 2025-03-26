@@ -1,6 +1,5 @@
 const axios = require('axios');
 const config = require('../config/config');
-const User = require('../models/User');
 const messages = require('../utils/messages');
 
 // @desc    Generate Trivia questions
@@ -9,14 +8,6 @@ const messages = require('../utils/messages');
 exports.generateTrivia = async (req, res) => {
     try {
         const { topic, count = config.DEFAULT_QUESTION_COUNT} = req.body;
-
-        // Check if user has reached api call limit
-        if (req.user.role !== 'admin' && req.user.hasReachedApiLimit()) {
-            return res.status(403).json({
-                success: false,
-                message: messages.API_LIMIT_REACHED,
-            });
-        }
 
         // Validate topic parameter
         if (!topic) {

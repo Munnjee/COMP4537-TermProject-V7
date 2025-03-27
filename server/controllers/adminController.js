@@ -74,7 +74,7 @@ exports.updateUserRole = async (req, res, next) => {
     if (!role || !['user', 'admin'].includes(role)) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide a valid role (user or admin)',
+        message: messages.INVALID_ROLE,
       });
     }
     
@@ -84,7 +84,7 @@ exports.updateUserRole = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User not found',
+        message: messages.USER_NOT_FOUND,
       });
     }
     
@@ -95,7 +95,7 @@ exports.updateUserRole = async (req, res, next) => {
     res.status(200).json({
       success: true,
       data: user,
-      message: `User role updated to ${role} successfully`,
+      message: messages.USER_ROLE_UPDATED.replace('{role}', role),
     });
   } catch (error) {
     console.error('Update user role error:', error);
@@ -117,7 +117,7 @@ exports.deleteUsers = async (req, res, next) => {
     if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide valid user IDs to delete',
+        message: messages.NO_VALID_USER_IDS,
       });
     }
     
@@ -125,7 +125,7 @@ exports.deleteUsers = async (req, res, next) => {
     if (userIds.includes(req.user.id.toString())) {
       return res.status(400).json({
         success: false,
-        message: 'You cannot delete your own account',
+        message: messages.CANNOT_DELETE_SELF,
       });
     }
 
@@ -145,7 +145,7 @@ exports.deleteUsers = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: result.deletedCount,
-      message: `Successfully deleted ${result.deletedCount} user(s) and their associated data`,
+      message: messages.USERS_DELETED.replace('{count}', result.deletedCount),
     });
   } catch (error) {
     console.error('Delete users error:', error);

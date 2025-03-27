@@ -314,6 +314,10 @@ const Game = () => {
   // Current Question
   const currentQuestion = questions[currentQuestionIndex];
 
+  if (!currentQuestion) {
+    return <div className='loading-game'>{messages.LOADING_QUIZ}</div>;
+  }
+
   return (
     <div
       className={`game-container ${isExiting ? 'exiting' : 'entering'}`}
@@ -377,7 +381,7 @@ const Game = () => {
         <h2 className='question-text'>{currentQuestion?.question}</h2>
 
         <div className='options-grid'>
-          {currentQuestion?.options.map((option, index) => (
+          {currentQuestion?.options?.map((option, index) => (
             <button
               key={index}
               className={`game-option ${

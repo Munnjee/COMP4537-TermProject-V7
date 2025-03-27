@@ -7,7 +7,7 @@ const {
   deleteUsers
 } = require('../controllers/adminController');
 const { protect, authorize, trackApiUsage } = require('../middleware/auth');
-
+const messages = require('../utils/messages');
 
 const router = express.Router();
 
@@ -19,7 +19,7 @@ router.use(trackApiUsage);
 router.get('/verify-access', (req, res) => {
   res.status(200).json({
     success: true,
-    message: 'Admin access verified'
+    message: messages.ADMIN_ACCESS_VERIFIED
   });
 });
 
@@ -33,7 +33,7 @@ router.delete('/users', deleteUsers);
 router.all('*', (req, res) => {
   res.status(404).json({
     success: false,
-    message: `Admin route not found: ${req.originalUrl}`
+    message: messages.ADMIN_ROUTE_NOT_FOUND.replace('{route}', req.originalUrl)
   });
 });
 

@@ -13,6 +13,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const apiRoutes = require('./routes/apiRoutes');
 const scoreRoutes = require('./routes/scoreRoutes');
+const messages = require('./utils/messages');
 
 const app = express();
 
@@ -65,7 +66,7 @@ app.use((req, res) => {
     if (!req.user) {
       return res.status(401).json({
         success: false,
-        message: `Authentication required for: ${req.originalUrl}`,
+        message: messages.AUTHENTICATION_REQUIRED.replace('{route}', req.originalUrl),
       });
     }
     
@@ -73,21 +74,21 @@ app.use((req, res) => {
     if (req.user && req.user.role !== 'admin') {
       return res.status(403).json({
         success: false,
-        message: `Admin access required for: ${req.originalUrl}`,
+        message: messages.ADMIN_ACCESS_REQUIRED.replace('{route}', req.originalUrl),
       });
     }
     
     // If admin but route not found, return 404
     return res.status(404).json({
       success: false,
-      message: `Admin route not found: ${req.originalUrl}`,
+      message: messages.ADMIN_ROUTE_NOT_FOUND.replace('{route}', req.originalUrl),
     });
   }
   
   // Generic 404 for other routes
   res.status(404).json({
     success: false,
-    message: `Route not found: ${req.originalUrl}`,
+    message: messages.ROUTE_NOT_FOUND.replace('{route}', req.originalUrl),
   });
 });
 

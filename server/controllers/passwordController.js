@@ -58,7 +58,7 @@ exports.forgotPassword = async (req, res) => {
     // Send email
     await sendEmail({
       email,
-      subject: 'Password Reset Request',
+      subject: messages.PASSWORD_RESET_REQUEST_SUBJECT,
       html,
     });
 
@@ -128,7 +128,7 @@ exports.resetPassword = async (req, res) => {
 
     await sendEmail({
       email: user.email,
-      subject: 'Password Reset Successful',
+      subject: messages.PASSWORD_RESET_SUCCESS_SUBJECT,
       html,
     });
 
